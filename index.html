@@ -444,6 +444,7 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
   display: flex; gap: 6px; overflow-x: auto;
   scrollbar-width: none; padding-bottom: 2px;
   touch-action: pan-x;
+  touch-action: pan-x;
 }
 .fmt-font-row::-webkit-scrollbar { display: none; }
 
@@ -451,6 +452,7 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
 .fmt-swatch-row { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
 
 .font-pill {
+  touch-action: manipulation;
   padding: 5px 12px; background: var(--card);
   border: 0.5px solid var(--border); border-radius: 20px;
   font-size: 12px; color: var(--text-soft); cursor: pointer;
@@ -1559,10 +1561,32 @@ function switchTab(e, tab) {
   document.getElementById('fmt-panel-' + tab).classList.add('active');
 }
 
-function doFmt(e, type) {
-  e.preventDefault(); // keeps focus + selection alive on mobile
+// Save selection before toolbar tap steals focus
+let _savedRange = null;
+document.addEventListener('pointerdown', e => {
   const area = document.getElementById('writing-area');
-  area.focus();
+  if (!area) return;
+  // If tap is NOT inside the writing area, save the current selection
+  if (!area.contains(e.target)) {
+    const sel = window.getSelection();
+    if (sel && sel.rangeCount > 0 && area.contains(sel.anchorNode)) {
+      _savedRange = sel.getRangeAt(0).cloneRange();
+    }
+  }
+}, true);
+
+function restoreSelection() {
+  if (!_savedRange) return false;
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(_savedRange);
+  return !_savedRange.collapsed;
+}
+
+function doFmt(e, type) {
+  e.preventDefault();
+  const area = document.getElementById('writing-area');
+  restoreSelection();
   if (type === 'bold') {
     document.execCommand('bold', false, null);
     document.getElementById('fmt-bold').classList.toggle('active', document.queryCommandState('bold'));
@@ -1611,14 +1635,29 @@ function applyTextFont(e, font, el) {
   document.querySelectorAll('#text-fonts .font-pill').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
   const area = document.getElementById('writing-area');
+  const hadSelection = restoreSelection();
   const sel = window.getSelection();
-  if (sel && !sel.isCollapsed && area.contains(sel.anchorNode)) {
-    area.focus();
+  if (hadSelection && sel && !sel.isCollapsed && area.contains(sel.anchorNode)) {
     wrapSelection('fontFamily', font);
   } else {
+    // No selection — set the div default AND insert a zero-width span at cursor
+    // so new characters typed inherit the chosen font
     area.style.fontFamily = font;
-    // Move caret to end so new typing uses the new font
     area.focus();
+    const sel2 = window.getSelection();
+    if (sel2 && sel2.rangeCount > 0 && area.contains(sel2.anchorNode)) {
+      const range = sel2.getRangeAt(0);
+      const anchor = document.createElement('span');
+      anchor.style.fontFamily = font;
+      anchor.appendChild(document.createTextNode('​')); // zero-width space
+      range.insertNode(anchor);
+      // Place caret inside the span so typing flows into it
+      const r2 = document.createRange();
+      r2.setStart(anchor.firstChild, 1);
+      r2.collapse(true);
+      sel2.removeAllRanges();
+      sel2.addRange(r2);
+    }
   }
 }
 
