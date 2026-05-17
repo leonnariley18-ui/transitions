@@ -542,7 +542,9 @@ body.writing-active .sync-dot { display: none; }
 .viewer-context { font-size: 11px; color: var(--text-muted); font-style: italic; margin-bottom: 10px; font-weight: 300; }
 .viewer-context strong { color: var(--accent); font-weight: 400; font-style: normal; }
 .viewer-title { font-family: var(--font-display); font-size: 20px; color: var(--text); font-style: italic; margin-bottom: 12px; border-bottom: 0.5px solid var(--border); padding-bottom: 10px; }
-.viewer-body { font-family: var(--font-display); font-size: 14px; line-height: 1.85; color: var(--text-soft); white-space: pre-wrap; }
+.viewer-body { font-family: var(--font-display); font-size: 14px; line-height: 1.85; color: var(--text-soft); }
+.viewer-body p { margin-bottom: 0.5em; }
+.viewer-body p:last-child { margin-bottom: 0; }
 .draft-banner {
   background: #FDF8F0; border-radius: var(--radius-sm);
   border: 0.5px solid #E8C98A;
@@ -1372,6 +1374,8 @@ function saveEntry() {
     date: fmt(new Date()),
     dateDisplay: new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }),
     title: title || null,
+    titleFont: document.getElementById('title-input').style.fontFamily || activeDisplayFont,
+    editorFont: document.querySelector('.ql-editor')?.style.fontFamily || '',
     body: bodyText, bodyHTML: quill.root.innerHTML,
     bodyDelta: JSON.stringify(quill.getContents()),
     vibe: selectedVibe,
@@ -1485,11 +1489,13 @@ function viewEntry(id) {
   const wrap = document.getElementById('entry-viewer-wrap');
   const catsStr = entry.cats ? entry.cats.join(' + ') : 'protection';
   const vibeStr = entry.vibe ? `arrived <strong>${entry.vibe}</strong> \u00b7 ` : '';
+  const titleStyle = entry.titleFont ? `font-family:${entry.titleFont}` : '';
+  const bodyStyle  = entry.editorFont ? `font-family:${entry.editorFont}` : '';
   wrap.style.display = 'block';
   wrap.innerHTML = `<div class="entry-viewer">
     <div class="viewer-context">${vibeStr}wrote through ${catsStr}</div>
-    ${entry.title ? `<div class="viewer-title">${entry.title}</div>` : ''}
-    <div class="viewer-body">${entry.bodyHTML || entry.body}</div>
+    ${entry.title ? `<div class="viewer-title" style="${titleStyle}">${entry.title}</div>` : ''}
+    <div class="viewer-body" style="${bodyStyle}">${entry.bodyHTML || '<p>' + entry.body + '</p>'}</div>
     <button class="viewer-close" onclick="closeViewer()">close</button>
   </div>`;
   wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
