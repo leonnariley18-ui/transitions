@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1A1728">
+<title>night journal</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #1A1728; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+.wrap { padding: 2rem 1.25rem 3rem; max-width: 400px; margin: 0 auto; background: #1A1728; min-height: 100vh; }
+.label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #7068A0; margin-bottom: 8px; font-weight: 500; }
+.anchor-card { background: #221E35; border: 0.5px solid #38305A; border-radius: 14px; padding: 1.1rem 1.25rem; margin-bottom: 1.75rem; }
+.anchor-q { font-size: 16px; line-height: 1.65; color: #F0ECF8; font-weight: normal; font-family: Georgia, serif; }
+.anchor-divider { height: 0.5px; background: #38305A; margin: 12px 0; }
+.anchor-why { font-size: 12px; line-height: 1.8; color: #7068A0; font-weight: 300; }
+.anchor-why em { font-family: Georgia, serif; font-style: italic; color: #9088C0; }
+.anchor-note { font-size: 11px; color: #4A4270; margin-top: 10px; font-style: italic; }
+.mood-label { font-size: 13px; color: #B8B0D4; margin-bottom: 10px; }
+.mood-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 1.5rem; }
+.mood-btn { padding: 10px 6px; border: 0.5px solid #38305A; border-radius: 10px; background: #221E35; cursor: pointer; font-size: 12px; color: #B8B0D4; text-align: center; line-height: 1.4; transition: all 0.15s; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+.mood-btn:hover { background: #2C2848; }
+.mood-btn.selected { border: 1.5px solid #E090A8; color: #E090A8; background: #341825; }
+.question-card { background: #221E35; border: 0.5px solid #38305A; border-radius: 14px; padding: 1.1rem 1.25rem; margin-bottom: 1rem; min-height: 96px; display: flex; flex-direction: column; justify-content: center; }
+.question-text { font-size: 16px; line-height: 1.65; color: #F0ECF8; font-family: Georgia, serif; }
+.question-placeholder { font-size: 14px; color: #7068A0; font-style: italic; line-height: 1.6; }
+.why-wrap { display: none; }
+.why-wrap.visible { display: block; }
+.why-divider { height: 0.5px; background: #38305A; margin: 14px 0 12px; }
+.why-label { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #7068A0; margin-bottom: 7px; font-weight: 500; }
+.why-text { font-size: 12px; line-height: 1.8; color: #7068A0; font-weight: 300; }
+.why-text em { font-family: Georgia, serif; font-style: italic; color: #9088C0; }
+.btn-row { display: flex; gap: 8px; }
+.btn-primary { flex: 1; padding: 11px; background: #E090A8; border: none; border-radius: 10px; font-size: 13px; color: #fff; cursor: pointer; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; transition: opacity 0.15s, transform 0.1s; letter-spacing: 0.02em; }
+.btn-primary:hover { opacity: 0.88; }
+.btn-primary:active { transform: scale(0.98); }
+.btn-reroll { padding: 11px 14px; background: transparent; border: 0.5px solid #38305A; border-radius: 10px; font-size: 12px; color: #7068A0; cursor: pointer; transition: all 0.15s; white-space: nowrap; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+.btn-reroll:hover:not(:disabled) { background: #2C2848; color: #B8B0D4; }
+.btn-reroll:disabled { opacity: 0.3; cursor: not-allowed; }
+.reroll-note { font-size: 11px; color: #7068A0; text-align: right; margin-top: 6px; min-height: 18px; font-style: italic; }
+.season-note { font-size: 11px; color: #4A4270; text-align: center; margin-top: 2rem; font-style: italic; letter-spacing: 0.04em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h2 class="sr-only">Night journal question randomizer with mood filter, anchor question, and why paragraphs</h2>
+
+  <div class="anchor-card">
+    <div class="label">Q1 · anchor — every night</div>
+    <div class="anchor-q">Is there anything my body is still carrying that I can consciously release?</div>
+    <div class="anchor-divider"></div>
+    <div class="anchor-why">Unprocessed stress doesn't just live in your mind — it lives in your body as physical tension, shallow breathing, and looping thoughts that won't let you rest. This question is an invitation to notice what's still activated in you before you try to sleep. The simple act of asking it begins to signal to your nervous system that the day is complete, that it's safe to stand down. You're not suppressing anything — you're teaching your body how to <em>close a chapter</em>.</div>
+    <div class="anchor-note">start here, always. your second question follows below.</div>
+  </div>
+
+  <div class="mood-label">how are you feeling tonight?</div>
+  <div class="mood-row">
+    <button class="mood-btn" onclick="selectMood('good', this)">pretty good</button>
+    <button class="mood-btn" onclick="selectMood('middle', this)">in between</button>
+    <button class="mood-btn" onclick="selectMood('hard', this)">it was hard</button>
+  </div>
+
+  <div class="question-card" id="q-card">
+    <div id="q-num" class="label" style="display:none; margin-bottom:6px;"></div>
+    <div id="q-text" class="question-placeholder">select a mood to get your second question</div>
+    <div class="why-wrap" id="why-wrap">
+      <div class="why-divider"></div>
+      <div class="why-label">why this question</div>
+      <div class="why-text" id="why-text"></div>
+    </div>
+  </div>
+
+  <div class="btn-row" id="btn-row" style="display:none">
+    <button class="btn-primary" id="btn-get" onclick="getQuestion()">give me a question</button>
+    <button class="btn-reroll" id="btn-reroll" onclick="reroll()" disabled>not tonight</button>
+  </div>
+  <div class="reroll-note" id="reroll-note"></div>
+
+  <div class="season-note">anchor revisited seasonally — next check-in: august 2026</div>
+</div>
+
+<script>
+const questions = {
+  good: [
+    {
+      num: 2,
+      q: "What did I handle today that I once thought I couldn't?",
+      why: "Your nervous system builds confidence through evidence, not affirmations. When you answer this question, you're giving your brain concrete proof that you are capable — proof it can actually hold onto overnight. Without this kind of intentional reflection, most of us end the day mentally scanning for what we missed or fell short of, which keeps us in a low-grade stress state while we sleep. This question interrupts that default and replaces it with something real."
+    },
+    {
+      num: 3,
+      q: "What moment today felt most like me?",
+      why: "Most days pull you in multiple directions — work mode, social mode, performance mode. This question cuts through all of that and asks you to locate the moment where none of that was happening, where you were just fully yourself. It's a quiet act of identity reinforcement. Your nervous system settles when it has a clear, stable sense of who you are. Finding that moment, even a small one, gives it something solid to rest on overnight."
+    },
+    {
+      num: 4,
+      q: "What's one thing I'm proud of, even if it's tiny?",
+      why: "Healthy pride — pride rooted in effort rather than outcome — is a nervous system stabilizer. This question builds what's called identity safety: a quiet internal sense that you are someone who tries, who shows up, who moves forward. It also reduces your brain's threat-scanning overnight, so instead of your mind searching for danger while you sleep, it has something solid and good to rest on. Small wins are not consolation prizes. They are the actual building blocks of lasting confidence."
+    },
+    {
+      num: 5,
+      q: "When did I show grace today — to someone else, or to myself?",
+      why: "Grace is a word that shows up in your writing again and again — on the subway, in a depressive episode, in a Murphy's Law kind of day. You already live by this value. This question makes it visible so your nervous system can register it consciously. When we name the moments where we acted from our best selves, we reinforce those neural pathways. You're not just reflecting — you're literally building the version of yourself you want to keep showing up as."
+    },
+    {
+      num: 6,
+      q: "Where did I show up for someone today, even in a small way?",
+      why: "This question shifts your focus outward and builds a sense of relational contribution, which is deeply regulating for the nervous system. We are wired for connection — and knowing that we mattered to someone today, even briefly, activates a sense of safety and belonging that carries into sleep. It doesn't have to be a grand gesture. A reply, a moment of attention, a kind word. Those count. They always counted."
+    },
+    {
+      num: 7,
+      q: "What did I give myself permission for today?",
+      why: "We spend a lot of energy asking for permission — from other people, from our own inner critic, from some invisible standard we're trying to meet. This question asks you to locate the moments where you gave yourself permission instead — to rest, to feel something, to not be everything, to just be where you were. Naming those moments reinforces your autonomy and your self-trust. It tells your nervous system that you are safe in your own hands."
+    }
+  ],
+  middle: [
+    {
+      num: 8,
+      q: "What did my body need today, and did I listen?",
+      why: "Your body communicates constantly — through tension, fatigue, hunger, restlessness, the need to be still. This question asks you to look back at those signals and honestly assess how you responded. It's not about judgment. It's about building interoceptive awareness — the skill of actually hearing your body over time. The more you practice naming what your body needed, the better you get at hearing it in real time rather than hours after the fact."
+    },
+    {
+      num: 9,
+      q: "What moment today do I want to remember?",
+      why: "Your brain's negativity bias means it's designed to hold onto threat and difficulty while letting positive moments slip through. This question is a direct counter to that bias — it trains your mind to actively hunt for meaning and to consolidate positive memory before sleep. Over time, this practice literally changes what your brain reaches for first. It's small and it's powerful and most people never do it."
+    },
+    {
+      num: 10,
+      q: "What was the emotional texture of today — and what drove it?",
+      why: "Not what happened — how it felt. This question asks you to sit with the quality of the day rather than its events. Was it heavy, bright, flat, chaotic, tender? And underneath that texture, what was actually driving it — a conversation, a decision, a physical state, something unresolved? This kind of reflection builds emotional literacy, which is the foundation of self-regulation. You can't manage what you can't name."
+    },
+    {
+      num: 7,
+      q: "What did I give myself permission for today?",
+      why: "We spend a lot of energy asking for permission — from other people, from our own inner critic, from some invisible standard we're trying to meet. This question asks you to locate the moments where you gave yourself permission instead — to rest, to feel something, to not be everything, to just be where you were. Naming those moments reinforce your autonomy and your self-trust. It tells your nervous system that you are safe in your own hands."
+    },
+    {
+      num: 6,
+      q: "Where did I show up for someone today, even in a small way?",
+      why: "This question shifts your focus outward and builds a sense of relational contribution, which is deeply regulating for the nervous system. We are wired for connection — and knowing that we mattered to someone today, even briefly, activates a sense of safety and belonging that carries into sleep. It doesn't have to be a grand gesture. A reply, a moment of attention, a kind word. Those count. They always counted."
+    },
+    {
+      num: 11,
+      q: "Where was I performing today, and where was I actually myself?",
+      why: "The corporate mask is real and it costs something — energy, presence, the particular kind of tiredness that comes not from doing but from being something you're not. This question asks you to map that honestly before you sleep. Not to judge the performance — sometimes it's necessary and even skillful — but to locate where the real you still showed up anyway. That location matters. It tells you where your energy is coming from and where it's going."
+    }
+  ],
+  hard: [
+    {
+      num: 12,
+      q: "Today was hard. What did I still manage, despite that?",
+      why: "On difficult days, the default is to let the hardness be the whole story. This question refuses that. It doesn't minimize what was hard — it holds both things at once: the difficulty and the evidence of your survival within it. That's where real resilience lives, not in the absence of hard days but in the proof that you move through them. Your nervous system needs that proof. Give it to it before you sleep."
+    },
+    {
+      num: 13,
+      q: "What was hard today, and what does that say about what I care about?",
+      why: "This is one of the most reframing questions in the bank because it takes struggle and turns it into signal. You don't find something hard unless it matters to you. The difficulty is pointing at a value, a desire, something worth protecting. When you can locate what the hard thing was actually about, it stops feeling like failure and starts feeling like evidence of what you're committed to. That shift — from defeat to meaning — is genuinely regulating."
+    },
+    {
+      num: 14,
+      q: "What would I say to a friend who had the exact day I just had?",
+      why: "This is one of the most powerful self-compassion tools that exists, and it works because it bypasses your inner critic. When it's someone else, you naturally find the kindness, the perspective, the gentleness. When it's you, your brain defaults to judgment. This question tricks the system. You write for your friend and you end up writing for yourself. The words land differently. They often land exactly right."
+    },
+    {
+      num: 15,
+      q: "Did I let good enough be enough today?",
+      why: "Perfectionism is physiological. It keeps your nervous system in a low-grade threat state, scanning for where you fell short, where you didn't do enough, where you should have been more. This question asks you to audit that honestly — not with more self-criticism, but with curiosity. Did you release yourself from the standard today, even once? If not, this is the moment to do it retroactively. The day is done. Good enough was always enough."
+    },
+    {
+      num: 11,
+      q: "Where was I performing today, and where was I actually myself?",
+      why: "The corporate mask is real and it costs something — energy, presence, the particular kind of tiredness that comes not from doing but from being something you're not. This question asks you to map that honestly before you sleep. Not to judge the performance — sometimes it's necessary and even skillful — but to locate where the real you still showed up anyway. That location matters. It tells you where your energy is coming from and where it's going."
+    },
+    {
+      num: 8,
+      q: "What did my body need today, and did I listen?",
+      why: "Your body communicates constantly — through tension, fatigue, hunger, restlessness, the need to be still. This question asks you to look back at those signals and honestly assess how you responded. It's not about judgment. It's about building interoceptive awareness — the skill of actually hearing your body over time. The more you practice naming what your body needed, the better you get at hearing it in real time rather than hours after the fact."
+    }
+  ]
+};
+
+let currentMood = null;
+let lastQuestion = null;
+let rerollUsed = false;
+
+function selectMood(mood, btn) {
+  currentMood = mood;
+  rerollUsed = false;
+  lastQuestion = null;
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  const el = document.getElementById('q-text');
+  el.textContent = 'ready when you are';
+  el.className = 'question-placeholder';
+  document.getElementById('why-wrap').classList.remove('visible');
+  document.getElementById('q-num').style.display = 'none';
+  document.getElementById('btn-row').style.display = 'flex';
+  document.getElementById('btn-get').textContent = 'give me a question';
+  document.getElementById('btn-reroll').disabled = true;
+  document.getElementById('reroll-note').textContent = '';
+}
+
+function getQuestion() {
+  if (!currentMood) return;
+  rerollUsed = false;
+  const pool = questions[currentMood].filter(item => item.q !== lastQuestion);
+  const item = pool[Math.floor(Math.random() * pool.length)];
+  lastQuestion = item.q;
+  showQuestion(item);
+  document.getElementById('btn-reroll').disabled = false;
+  document.getElementById('reroll-note').textContent = 'one re-roll available';
+  document.getElementById('btn-get').textContent = 'new question';
+}
+
+function reroll() {
+  if (rerollUsed || !currentMood) return;
+  rerollUsed = true;
+  const pool = questions[currentMood].filter(item => item.q !== lastQuestion);
+  const item = pool[Math.floor(Math.random() * pool.length)];
+  lastQuestion = item.q;
+  showQuestion(item);
+  document.getElementById('btn-reroll').disabled = true;
+  document.getElementById('reroll-note').textContent = 'no more re-rolls tonight';
+}
+
+function showQuestion(item) {
+  const el = document.getElementById('q-text');
+  el.textContent = item.q;
+  el.className = 'question-text';
+  document.getElementById('q-num').textContent = 'Q' + item.num;
+  document.getElementById('q-num').style.display = 'block';
+  document.getElementById('why-text').innerHTML = item.why;
+  document.getElementById('why-wrap').classList.add('visible');
+}
+</script>
+</body>
+</html>
