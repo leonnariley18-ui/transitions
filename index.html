@@ -1561,22 +1561,21 @@ function switchTab(e, tab) {
   document.getElementById('fmt-panel-' + tab).classList.add('active');
 }
 
-// Save selection before toolbar tap steals focus
+// Track selection continuously so we can restore it after toolbar taps
 let _savedRange = null;
-document.addEventListener('pointerdown', e => {
+document.addEventListener('selectionchange', () => {
   const area = document.getElementById('writing-area');
   if (!area) return;
-  // If tap is NOT inside the writing area, save the current selection
-  if (!area.contains(e.target)) {
-    const sel = window.getSelection();
-    if (sel && sel.rangeCount > 0 && area.contains(sel.anchorNode)) {
-      _savedRange = sel.getRangeAt(0).cloneRange();
-    }
+  const sel = window.getSelection();
+  if (sel && sel.rangeCount > 0 && area.contains(sel.anchorNode)) {
+    _savedRange = sel.getRangeAt(0).cloneRange();
   }
-}, true);
+});
 
 function restoreSelection() {
   if (!_savedRange) return false;
+  const area = document.getElementById('writing-area');
+  area.focus();
   const sel = window.getSelection();
   sel.removeAllRanges();
   sel.addRange(_savedRange);
@@ -1620,12 +1619,12 @@ function applyFontSize(px) {
 
 function buildFontPills() {
   document.getElementById('text-fonts').innerHTML = TEXT_FONTS.map((f, i) =>
-    `<span class="font-pill${i===0?' active':''}" style="font-family:${f.value}"
-      onpointerdown="applyTextFont(event,'${f.value}',this)">${f.label}</span>`
+    `<button class="font-pill${i===0?' active':''}" style="font-family:${f.value}"
+      onclick="applyTextFont(event,'${f.value}',this)">${f.label}</button>`
   ).join('');
   document.getElementById('display-fonts').innerHTML = DISPLAY_FONTS.map((f, i) =>
-    `<span class="font-pill${i===0?' active':''}" style="font-family:${f.value}"
-      onpointerdown="applyDisplayFont(event,'${f.value}',this)">${f.label}</span>`
+    `<button class="font-pill${i===0?' active':''}" style="font-family:${f.value}"
+      onclick="applyDisplayFont(event,'${f.value}',this)">${f.label}</button>`
   ).join('');
 }
 
