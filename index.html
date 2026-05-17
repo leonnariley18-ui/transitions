@@ -424,19 +424,27 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
 /* Quill overrides */
 .ql-toolbar.ql-snow {
   border: none; border-bottom: 0.5px solid var(--border);
-  background: var(--bg2); padding: 5px 12px; display: flex; flex-wrap: wrap; gap: 1px;
+  background: var(--bg2);
+  padding: 4px 8px;
+  display: flex; flex-wrap: nowrap; overflow-x: auto;
+  scrollbar-width: none; gap: 0;
+  -webkit-overflow-scrolling: touch;
 }
+.ql-toolbar.ql-snow::-webkit-scrollbar { display: none; }
+.ql-toolbar.ql-snow .ql-formats { margin-right: 6px; flex-shrink: 0; }
 .ql-container.ql-snow {
   border: none; flex: 1;
   font-family: var(--font-display); font-size: 15px; color: var(--text); background: var(--bg);
 }
 .ql-editor { padding: 18px 22px 120px; line-height: 1.85; color: var(--text); font-family: inherit; font-weight: 300; }
 .ql-editor.ql-blank::before { color: var(--text-xmuted); font-style: italic; font-family: var(--font-display); left: 22px; right: 22px; }
+/* Keep keyboard up - don't interfere with selection */
+.ql-editor { -webkit-user-select: text !important; user-select: text !important; }
 .ql-snow .ql-stroke { stroke: var(--text-muted); stroke-width: 1.5px; }
 .ql-snow .ql-fill, .ql-snow .ql-stroke.ql-fill { fill: var(--text-muted); }
 .ql-snow .ql-picker { color: var(--text-muted); font-family: var(--font-body); font-size: 11px; }
-.ql-snow .ql-picker-label { border-color: var(--border) !important; border-radius: 6px; padding: 2px 6px; }
-.ql-snow.ql-toolbar button { padding: 4px 5px; border-radius: 6px; }
+.ql-snow .ql-picker-label { border-color: var(--border) !important; border-radius: 6px; padding: 2px 5px; }
+.ql-snow.ql-toolbar button { padding: 3px 4px; border-radius: 6px; width: 26px; height: 26px; }
 .ql-snow.ql-toolbar button:hover,
 .ql-snow.ql-toolbar button.ql-active { background: var(--accent-soft); }
 .ql-snow.ql-toolbar button:hover .ql-stroke,
@@ -452,10 +460,35 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
 .ql-snow .ql-picker-label:hover,
 .ql-snow .ql-picker.ql-expanded .ql-picker-label { color: var(--accent); border-color: var(--accent-mid) !important; }
 .ql-snow .ql-picker.ql-expanded .ql-picker-label .ql-stroke { stroke: var(--accent); }
-.ql-snow .ql-color-picker .ql-picker-options { padding: 6px; width: 192px; }
-.ql-snow .ql-color-picker .ql-picker-item { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid transparent; margin: 2px; }
+/* Color picker — prevent overflow */
+.ql-snow .ql-color-picker.ql-color .ql-picker-options,
+.ql-snow .ql-color-picker.ql-background .ql-picker-options {
+  padding: 5px; width: 162px; right: 0; left: auto;
+}
+.ql-snow .ql-color-picker .ql-picker-item { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid transparent; margin: 2px; }
 .ql-snow .ql-color-picker .ql-picker-item:hover,
 .ql-snow .ql-color-picker .ql-picker-item.ql-selected { border-color: var(--accent); transform: scale(1.15); }
+/* Title font bar */
+.title-font-bar {
+  padding: 6px 22px 4px; background: var(--bg);
+  border-bottom: 0.5px solid var(--border-soft);
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+.title-font-label {
+  font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--text-muted); font-weight: 400; flex-shrink: 0;
+}
+.title-font-scroll {
+  display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none;
+}
+.title-font-scroll::-webkit-scrollbar { display: none; }
+.title-font-pill {
+  padding: 3px 10px; background: var(--card);
+  border: 0.5px solid var(--border); border-radius: 20px;
+  font-size: 11px; color: var(--text-soft); cursor: pointer;
+  white-space: nowrap; flex-shrink: 0;
+}
+.title-font-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
 .sync-dot {
   position: fixed; top: 14px; right: 16px;
@@ -466,6 +499,10 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
 .sync-dot.syncing { background: #C4A02A; animation: sdpulse 1s ease infinite; opacity: 0.8; }
 .sync-dot.error { background: #C46060; opacity: 1; }
 @keyframes sdpulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
+/* Hide sync dot on writing page */
+#page-writing.active ~ * .sync-dot,
+.page.active#page-writing + * #sync-dot { display: none; }
+body.writing-active .sync-dot { display: none; }
 
 .pdot {
   width: 13px; height: 13px; border-radius: 50%;
@@ -754,6 +791,10 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
         </div>
         <div class="writing-content">
           <div class="entry-context-display" id="writing-context"></div>
+          <div class="title-font-bar">
+            <span class="title-font-label">title</span>
+            <div class="title-font-scroll" id="display-fonts"></div>
+          </div>
           <input class="title-input" id="title-input" placeholder="title your morning…" />
         </div>
         <div class="quill-wrap"><div id="quill-editor"></div></div>
@@ -1037,9 +1078,6 @@ function checkDraft() {
   }
 }
 
-function saveDraft() { /* defined in Quill section below */ }
-
-function resumeDraft() { /* defined in Quill section below */ }
 
 function clearDraft() {
   localStorage.removeItem('transitions_draft');
@@ -1109,6 +1147,7 @@ function showPage(id) {
   page.querySelector('.screen-inner')?.scrollTo(0,0);
   const screen = document.querySelector('.screen');
   screen.scrollTo(0,0);
+  if (id !== 'page-writing') document.body.classList.remove('writing-active');
 }
 
 function goBack(targetPage) { showPage(targetPage); }
@@ -1255,13 +1294,55 @@ function initQuill() {
         [{ color: ['#2A2D4A','#6A5AC0','#8A4A9A','#2A5A8A','#2A7A5A','#8A5A2A','#7A7A9A','#C0607A','#000000','#ffffff'] },
          { background: ['#EAE8F8','#E8D8F0','#D8F0E8','#F0E8D8','#F8E8E8','#FDECC8','#E0E8F8',''] }],
         [{ size: ['small', false, 'large', 'huge'] }],
-        [{ list: 'bullet' }],
+        [{ list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
         ['clean'],
       ],
       history: { delay: 800, maxStack: 200, userOnly: true },
+      keyboard: {
+        bindings: {
+          'undo': { key: 'Z', shortKey: true, handler() { quill.history.undo(); } },
+          'redo': { key: 'Z', shortKey: true, shiftKey: true, handler() { quill.history.redo(); } },
+        }
+      }
     },
   });
+
+  // Add undo/redo buttons to toolbar after init
+  const toolbar = quill.getModule('toolbar');
+  const tbEl = toolbar.container;
+  const undoRedoGroup = document.createElement('span');
+  undoRedoGroup.className = 'ql-formats';
+  undoRedoGroup.innerHTML = `
+    <button class="ql-undo" title="Undo">
+      <svg viewBox="0 0 18 18"><polygon class="ql-fill ql-stroke" points="6 10 4 12 2 10 6 10"></polygon><path class="ql-stroke" d="M8.09,13.91A4.6,4.6,0,0,0,9,14,5,5,0,1,0,4,9"></path></svg>
+    </button>
+    <button class="ql-redo" title="Redo">
+      <svg viewBox="0 0 18 18"><polygon class="ql-fill ql-stroke" points="12 10 14 12 16 10 12 10"></polygon><path class="ql-stroke" d="M9.91,13.91A4.6,4.6,0,0,1,9,14,5,5,0,1,1,14,9"></path></svg>
+    </button>`;
+  tbEl.appendChild(undoRedoGroup);
+  undoRedoGroup.querySelector('.ql-undo').addEventListener('click', () => quill.history.undo());
+  undoRedoGroup.querySelector('.ql-redo').addEventListener('click', () => quill.history.redo());
 }
+
+function buildFontPills() {
+  // Title (display) font pills
+  const displayEl = document.getElementById('display-fonts');
+  if (displayEl) {
+    displayEl.innerHTML = DISPLAY_FONTS.map((f, i) =>
+      `<span class="title-font-pill${i===0?' active':''}" style="font-family:${f.value}" onclick="setTitleFont('${i}',this)">${f.label}</span>`
+    ).join('');
+  }
+}
+
+function setTitleFont(idx, el) {
+  const font = DISPLAY_FONTS[parseInt(idx)].value;
+  document.querySelectorAll('.title-font-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('title-input').style.fontFamily = font;
+  activeDisplayFont = font;
+}
+
+function buildColorSwatches() {} // handled by Quill
 
 function goToWriting() {
   const q = selectedQuestion ? QUESTIONS.find(q => q.id === selectedQuestion) : null;
@@ -1273,6 +1354,7 @@ function goToWriting() {
   document.getElementById('title-input').value = '';
   document.getElementById('writing-date-label').textContent =
     new Date().toLocaleDateString('en-US', { weekday:'short', month:'long', day:'numeric' }).toLowerCase();
+  document.body.classList.add('writing-active');
   showPage('page-writing');
   initQuill();
   quill.setContents([]); quill.enable();
@@ -1305,6 +1387,7 @@ function saveEntry() {
   document.querySelectorAll('.vibe-btn, .vibe-single').forEach(b => b.classList.remove('selected'));
   const btn = document.getElementById('vibe-next-btn');
   btn.style.opacity = '0.4'; btn.style.pointerEvents = 'none';
+  document.body.classList.remove('writing-active');
   showPage('page-home'); showToast('entry saved \u2728');
 }
 
@@ -1319,6 +1402,7 @@ function saveDraft() {
     selectedQuestion, anchorQ: ANCHOR.question, secondQ: q ? q.text : null,
     savedAt: new Date().toISOString(),
   }));
+  document.body.classList.remove('writing-active');
   showPage('page-home'); checkDraft(); showToast('draft saved \uD83C\uDF19');
 }
 
@@ -1334,6 +1418,7 @@ function resumeDraft() {
   document.getElementById('title-input').value = draft.title || '';
   document.getElementById('writing-date-label').textContent =
     new Date().toLocaleDateString('en-US', { weekday:'short', month:'long', day:'numeric' }).toLowerCase();
+  document.body.classList.add('writing-active');
   showPage('page-writing'); initQuill();
   try {
     if (draft.bodyDelta) quill.setContents(JSON.parse(draft.bodyDelta));
@@ -1341,6 +1426,57 @@ function resumeDraft() {
     else quill.setContents([]);
   } catch(e) { quill.setContents([]); }
   setTimeout(() => quill.focus(), 300);
+}
+
+// ── LIBRARY ───────────────────────────────────────────────────────────────
+function toggleLibrary() {
+  libraryOpen = !libraryOpen;
+  document.getElementById('library-panel').classList.toggle('open', libraryOpen);
+  document.getElementById('lib-arrow').classList.toggle('open', libraryOpen);
+}
+
+function toggleVibeFilter(vibe, el) {
+  const idx = activeVibeFilters.indexOf(vibe);
+  if (idx > -1) { activeVibeFilters.splice(idx, 1); el.className = 'filter-pill'; }
+  else { activeVibeFilters.push(vibe); el.className = `filter-pill active-vibe-${vibe}`; }
+  renderEntries();
+}
+
+function toggleCatFilter(cat, el) {
+  const idx = activeCatFilters.indexOf(cat);
+  if (idx > -1) { activeCatFilters.splice(idx, 1); el.className = 'filter-pill'; }
+  else { activeCatFilters.push(cat); el.className = 'filter-pill active-cat'; }
+  renderEntries();
+}
+
+function filterEntries() { renderEntries(); }
+
+function renderEntries() {
+  const query = (document.getElementById('search-input')?.value || '').toLowerCase();
+  let entries = [...appData.entries];
+  if (activeVibeFilters.length) entries = entries.filter(e => activeVibeFilters.includes(e.vibe));
+  if (activeCatFilters.length) entries = entries.filter(e => e.cats && e.cats.some(c => activeCatFilters.includes(c)));
+  if (query) entries = entries.filter(e =>
+    (e.title || '').toLowerCase().includes(query) ||
+    (e.body || '').toLowerCase().includes(query) ||
+    (e.date || '').toLowerCase().includes(query) ||
+    (e.vibe || '').toLowerCase().includes(query) ||
+    (e.cats || []).some(c => c.toLowerCase().includes(query))
+  );
+  const el = document.getElementById('entries-list');
+  if (!entries.length) { el.innerHTML = '<div class="no-entries">no entries found</div>'; return; }
+  el.innerHTML = entries.map(e => {
+    const catsStr = e.cats ? e.cats.join(' + ') : 'protection';
+    const vibeStr = e.vibe ? `arrived <strong>${e.vibe}</strong> \u00b7 ` : '';
+    const titleDisplay = e.title || 'untitled';
+    return `<div class="entry-row" onclick="viewEntry(${e.id})">
+      <div class="entry-top">
+        <span class="entry-date">${e.dateDisplay || e.date}</span>
+        <span class="entry-title">${titleDisplay}</span>
+      </div>
+      <div class="entry-context-line">${vibeStr}wrote through ${catsStr}</div>
+    </div>`;
+  }).join('');
 }
 
 function viewEntry(id) {
@@ -1359,12 +1495,30 @@ function viewEntry(id) {
   wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function buildFontPills() {}
-function buildColorSwatches() {}
+function closeViewer() {
+  document.getElementById('entry-viewer-wrap').style.display = 'none';
+}
+
+function exportEntries() {
+  if (!appData.entries.length) { showToast('no entries to export'); return; }
+  const lines = appData.entries.map(e => {
+    const cats = e.cats ? e.cats.join(' + ') : 'protection';
+    const vibe = e.vibe ? `arrived: ${e.vibe} \u00b7 ` : '';
+    const title = e.title ? `\n${e.title}` : '';
+    return `${e.dateDisplay || e.date}${title}\n${vibe}wrote through ${cats}\n\n${e.body}\n\n---`;
+  }).join('\n\n');
+  const blob = new Blob([lines], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url;
+  a.download = `transitions-${fmt(new Date())}.txt`; a.click();
+  URL.revokeObjectURL(url);
+  showToast('exported \u2728');
+}
+
+function insertList() { if (quill) quill.format('list','bullet'); }
 function switchTab() {} function doFmt() {} function toggleToolbar() {}
 function saveSelectionNow() {} function toggleFormat() {} function changeSize() {}
 function setTextFont() {} function setDisplayFont() {}
-function insertList() { if (quill) quill.format('list','bullet'); }
 </script>
 </body>
 </html>
