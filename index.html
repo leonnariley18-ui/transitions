@@ -395,16 +395,98 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
   font-family: var(--font-display); font-style: italic; color: var(--accent);
 }
 
-.writing-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 10px;
+/* ── Writing page layout ── */
+.writing-page-inner {
+  display: flex; flex-direction: column;
+  min-height: 100%;
 }
-.writing-date-label { font-size: 12px; color: var(--text-muted); font-weight: 300; }
-.save-btn-inline {
-  font-size: 12px; color: var(--accent);
-  font-weight: 500; letter-spacing: 0.04em;
-  background: none; border: none; cursor: pointer;
-  font-family: var(--font-body); padding: 4px 0;
+
+/* Sticky bar at top — always above keyboard */
+.writing-top-bar {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--bg2);
+  border-bottom: 0.5px solid var(--border);
+}
+
+/* Tab row */
+.fmt-tabs {
+  display: flex;
+}
+.fmt-tab {
+  flex: 1; padding: 9px 4px 8px;
+  font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text-muted); font-family: var(--font-body); font-weight: 400;
+  text-align: center; cursor: pointer;
+  border-bottom: 1.5px solid transparent;
+  user-select: none; touch-action: manipulation;
+}
+.fmt-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* Save row inside top bar */
+.writing-save-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 16px 6px;
+  border-top: 0.5px solid var(--border-soft);
+}
+.writing-date-label { font-size: 11px; color: var(--text-muted); font-weight: 300; }
+
+/* Panels */
+.fmt-panel { display: none; padding: 10px 14px 12px; background: var(--accent-soft); }
+.fmt-panel.active { display: block; }
+
+.fmt-section-label {
+  font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 6px; font-weight: 500;
+}
+.fmt-second-label { margin-top: 10px; }
+
+.fmt-font-row {
+  display: flex; gap: 6px; overflow-x: auto;
+  scrollbar-width: none; padding-bottom: 2px;
+  touch-action: pan-x;
+}
+.fmt-font-row::-webkit-scrollbar { display: none; }
+
+.fmt-style-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.fmt-swatch-row { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+
+.font-pill {
+  padding: 5px 12px; background: var(--card);
+  border: 0.5px solid var(--border); border-radius: 20px;
+  font-size: 12px; color: var(--text-soft); cursor: pointer;
+  white-space: nowrap; flex-shrink: 0;
+  touch-action: manipulation;
+}
+.font-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.fmt-btn {
+  padding: 7px 13px; background: var(--card);
+  border: 0.5px solid var(--border); border-radius: var(--radius-sm);
+  font-size: 12px; color: var(--text-soft); cursor: pointer;
+  font-family: var(--font-body); touch-action: manipulation;
+}
+.fmt-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.color-swatch {
+  width: 24px; height: 24px; border-radius: 50%; cursor: pointer;
+  border: 2px solid transparent; flex-shrink: 0;
+  touch-action: manipulation;
+}
+.color-swatch.active { border-color: var(--accent); outline: 2px solid var(--accent-mid); }
+
+.highlight-swatch {
+  width: 28px; height: 16px; border-radius: 4px; cursor: pointer;
+  border: 0.5px solid var(--border); flex-shrink: 0;
+  touch-action: manipulation;
+}
+.highlight-swatch.active { border-color: var(--accent); outline: 1px solid var(--accent); }
+
+.fmt-divider { height: 0.5px; background: var(--accent-mid); margin: 10px 0; }
+
+/* Writing content area — padded below the sticky bar */
+.writing-content {
+  padding: 16px 22px 120px;
+  flex: 1;
 }
 
 .entry-context-display {
@@ -436,95 +518,6 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
   content: attr(data-placeholder);
   color: var(--text-xmuted); pointer-events: none; font-style: italic;
 }
-
-.toolbar-toggle-bar {
-  display: flex; align-items: center; justify-content: center;
-  gap: 6px; padding: 10px 0 6px;
-  border-top: 0.5px solid var(--border); margin-top: 16px;
-  cursor: pointer; user-select: none;
-}
-.toolbar-toggle-label { font-size: 10px; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; }
-.toolbar-toggle-icon { font-size: 13px; color: var(--text-muted); transition: transform 0.25s; }
-.toolbar-toggle-icon.open { transform: rotate(180deg); }
-
-.toolbar-panel {
-  border-radius: var(--radius);
-  border: 0.5px solid var(--border);
-  overflow: hidden; max-height: 0;
-  transition: max-height 0.35s ease;
-  margin-bottom: 8px;
-}
-.toolbar-panel.open { max-height: 600px; }
-
-/* Tab row */
-.fmt-tabs {
-  display: flex; border-bottom: 0.5px solid var(--border);
-  background: var(--bg2);
-}
-.fmt-tab {
-  flex: 1; padding: 9px 4px 8px;
-  font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--text-muted); font-family: var(--font-body); font-weight: 400;
-  text-align: center; cursor: pointer;
-  border-bottom: 1.5px solid transparent; transition: all 0.15s;
-  user-select: none;
-}
-.fmt-tab.active { color: var(--accent); border-bottom-color: var(--accent); background: var(--bg2); }
-
-/* Panels */
-.fmt-panel { display: none; padding: 12px 14px 14px; background: var(--accent-soft); }
-.fmt-panel.active { display: block; }
-
-.fmt-section-label {
-  font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--accent); margin-bottom: 6px; font-weight: 500;
-}
-.fmt-section-label + .fmt-section-label,
-.fmt-second-label { margin-top: 10px; }
-
-.fmt-font-row {
-  display: flex; gap: 6px; overflow-x: auto;
-  scrollbar-width: none; padding-bottom: 2px;
-}
-.fmt-font-row::-webkit-scrollbar { display: none; }
-
-.fmt-style-row { display: flex; gap: 6px; flex-wrap: wrap; }
-
-.fmt-swatch-row { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
-
-.font-pill {
-  padding: 5px 12px; background: var(--card);
-  border: 0.5px solid var(--border); border-radius: 20px;
-  font-size: 12px; color: var(--text-soft); cursor: pointer;
-  white-space: nowrap; flex-shrink: 0; transition: all 0.15s;
-  /* intentionally no font-family here so each pill shows in its own font */
-}
-.font-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-
-.fmt-btn {
-  padding: 7px 13px; background: var(--card);
-  border: 0.5px solid var(--border); border-radius: var(--radius-sm);
-  font-size: 12px; color: var(--text-soft); cursor: pointer;
-  transition: background 0.15s; font-family: var(--font-body);
-  /* NO :active transform — interferes with touchstart prevention */
-}
-.fmt-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-
-.color-swatch {
-  width: 22px; height: 22px; border-radius: 50%; cursor: pointer;
-  border: 2px solid transparent; transition: border-color 0.15s, transform 0.15s;
-  flex-shrink: 0;
-}
-.color-swatch.active { border-color: var(--accent); transform: scale(1.15); }
-
-.highlight-swatch {
-  width: 26px; height: 14px; border-radius: 4px; cursor: pointer;
-  border: 0.5px solid var(--border); transition: border-color 0.15s, transform 0.15s;
-  flex-shrink: 0;
-}
-.highlight-swatch.active { border-color: var(--accent); transform: scale(1.1); }
-
-.fmt-divider { height: 0.5px; background: var(--accent-mid); margin: 10px 0; }
 
 .sync-dot {
   position: fixed; top: 14px; right: 16px;
@@ -614,6 +607,12 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
   transition: all 0.2s;
 }
 .draft-btn:active { background: var(--bg3); }
+.save-btn-inline {
+  font-size: 12px; color: var(--accent);
+  font-weight: 500; letter-spacing: 0.04em;
+  background: none; border: none; cursor: pointer;
+  font-family: var(--font-body); padding: 4px 0;
+}
 .draft-action {
   font-size: 11px; color: var(--accent);
   font-family: var(--font-body); font-weight: 400;
@@ -805,32 +804,14 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
 
     <!-- WRITING -->
     <div class="page" id="page-writing">
-      <div class="screen-inner">
-        <div class="writing-header">
-          <div class="writing-date-label" id="writing-date-label">—</div>
-          <div class="writing-btn-row">
-            <button class="draft-btn" onclick="saveDraft()">save draft</button>
-            <button class="save-btn-inline" onclick="saveEntry()">save</button>
-          </div>
-        </div>
+      <div class="writing-page-inner">
 
-        <div class="entry-context-display" id="writing-context"></div>
-
-        <input class="title-input" id="title-input" placeholder="title your morning…" />
-
-        <div class="writing-area" id="writing-area" contenteditable="true" data-placeholder="begin here…"></div>
-
-        <!-- Formatting toolbar — in document flow, below writing area -->
-        <div class="toolbar-toggle-bar" ontouchstart="saveSelectionNow()" onmousedown="saveSelectionNow()" onclick="toggleToolbar()">
-          <span class="toolbar-toggle-label">formatting</span>
-          <span class="toolbar-toggle-icon" id="toolbar-toggle-icon">▾</span>
-        </div>
-
-        <div class="toolbar-panel" id="toolbar-panel">
+        <!-- Sticky top bar: tabs + save row -->
+        <div class="writing-top-bar">
           <div class="fmt-tabs">
-            <div class="fmt-tab active" id="fmt-tab-font"   ontouchstart="switchTab(event,'font')"   onmousedown="switchTab(event,'font')">font</div>
-            <div class="fmt-tab"        id="fmt-tab-style"  ontouchstart="switchTab(event,'style')"  onmousedown="switchTab(event,'style')">style</div>
-            <div class="fmt-tab"        id="fmt-tab-color"  ontouchstart="switchTab(event,'color')"  onmousedown="switchTab(event,'color')">color</div>
+            <div class="fmt-tab active" id="fmt-tab-font"  onpointerdown="switchTab(event,'font')">font</div>
+            <div class="fmt-tab"        id="fmt-tab-style" onpointerdown="switchTab(event,'style')">style</div>
+            <div class="fmt-tab"        id="fmt-tab-color" onpointerdown="switchTab(event,'color')">color</div>
           </div>
 
           <!-- Font panel -->
@@ -844,13 +825,13 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
           <!-- Style panel -->
           <div class="fmt-panel" id="fmt-panel-style">
             <div class="fmt-style-row">
-              <button class="fmt-btn" id="fmt-bold"    ontouchstart="doFmt(event,'bold')"    onmousedown="doFmt(event,'bold')"><b>B</b></button>
-              <button class="fmt-btn" id="fmt-italic"  ontouchstart="doFmt(event,'italic')"  onmousedown="doFmt(event,'italic')"><i>I</i></button>
-              <button class="fmt-btn" id="fmt-ul"      ontouchstart="doFmt(event,'list')"    onmousedown="doFmt(event,'list')">• list</button>
-              <button class="fmt-btn" id="fmt-size-up" ontouchstart="doFmt(event,'size+')"   onmousedown="doFmt(event,'size+')">A+</button>
-              <button class="fmt-btn" id="fmt-size-dn" ontouchstart="doFmt(event,'size-')"   onmousedown="doFmt(event,'size-')">A−</button>
-              <button class="fmt-btn" id="fmt-undo"    ontouchstart="doFmt(event,'undo')"    onmousedown="doFmt(event,'undo')">↩ undo</button>
-              <button class="fmt-btn" id="fmt-redo"    ontouchstart="doFmt(event,'redo')"    onmousedown="doFmt(event,'redo')">↪ redo</button>
+              <button class="fmt-btn" id="fmt-bold"    onpointerdown="doFmt(event,'bold')"><b>B</b></button>
+              <button class="fmt-btn" id="fmt-italic"  onpointerdown="doFmt(event,'italic')"><i>I</i></button>
+              <button class="fmt-btn" id="fmt-ul"      onpointerdown="doFmt(event,'list')">• list</button>
+              <button class="fmt-btn" id="fmt-size-up" onpointerdown="doFmt(event,'size+')">A+</button>
+              <button class="fmt-btn" id="fmt-size-dn" onpointerdown="doFmt(event,'size-')">A−</button>
+              <button class="fmt-btn" id="fmt-undo"    onpointerdown="doFmt(event,'undo')">↩</button>
+              <button class="fmt-btn" id="fmt-redo"    onpointerdown="doFmt(event,'redo')">↪</button>
             </div>
           </div>
 
@@ -862,6 +843,22 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
             <div class="fmt-section-label">highlight</div>
             <div class="fmt-swatch-row" id="highlight-swatches"></div>
           </div>
+
+          <!-- Save row -->
+          <div class="writing-save-row">
+            <div class="writing-date-label" id="writing-date-label">—</div>
+            <div class="writing-btn-row">
+              <button class="draft-btn" onclick="saveDraft()">save draft</button>
+              <button class="save-btn-inline" onclick="saveEntry()">save</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scrollable writing content -->
+        <div class="writing-content">
+          <div class="entry-context-display" id="writing-context"></div>
+          <input class="title-input" id="title-input" placeholder="title your morning…" />
+          <div class="writing-area" id="writing-area" contenteditable="true" data-placeholder="begin here…"></div>
         </div>
 
       </div>
@@ -1551,24 +1548,10 @@ function exportEntries() {
 }
 
 // ── TOOLBAR ───────────────────────────────────────────────────────────────
-let toolbarOpen = false;
 let activeFmtTab = 'font';
-let savedRange = null;
-
-// Called on touchstart/mousedown of the toggle bar — BEFORE blur fires
-function saveSelectionNow() {
-  const sel = window.getSelection();
-  savedRange = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0).cloneRange() : null;
-}
-
-function toggleToolbar() {
-  toolbarOpen = !toolbarOpen;
-  document.getElementById('toolbar-panel').classList.toggle('open', toolbarOpen);
-  document.getElementById('toolbar-toggle-icon').classList.toggle('open', toolbarOpen);
-}
 
 function switchTab(e, tab) {
-  e.preventDefault(); // keep focus on writing area
+  e.preventDefault();
   activeFmtTab = tab;
   document.querySelectorAll('.fmt-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.fmt-panel').forEach(p => p.classList.remove('active'));
@@ -1576,10 +1559,8 @@ function switchTab(e, tab) {
   document.getElementById('fmt-panel-' + tab).classList.add('active');
 }
 
-// All format actions — touchstart/mousedown with e.preventDefault()
-// so the writing area never loses focus and the selection stays live
 function doFmt(e, type) {
-  e.preventDefault();
+  e.preventDefault(); // keeps focus + selection alive on mobile
   const area = document.getElementById('writing-area');
   area.focus();
   if (type === 'bold') {
@@ -1604,11 +1585,8 @@ function doFmt(e, type) {
 }
 
 function applyFontSize(px) {
-  // execCommand fontSize only accepts 1-7, so we use a workaround:
-  // insert a marker size, then replace the generated <font> tags with <span>
   document.execCommand('fontSize', false, '7');
-  const area = document.getElementById('writing-area');
-  area.querySelectorAll('font[size="7"]').forEach(f => {
+  document.getElementById('writing-area').querySelectorAll('font[size="7"]').forEach(f => {
     const span = document.createElement('span');
     span.style.fontSize = px + 'px';
     span.innerHTML = f.innerHTML;
@@ -1619,14 +1597,11 @@ function applyFontSize(px) {
 function buildFontPills() {
   document.getElementById('text-fonts').innerHTML = TEXT_FONTS.map((f, i) =>
     `<span class="font-pill${i===0?' active':''}" style="font-family:${f.value}"
-      ontouchstart="applyTextFont(event,'${f.value}',this)"
-      onmousedown="applyTextFont(event,'${f.value}',this)">${f.label}</span>`
+      onpointerdown="applyTextFont(event,'${f.value}',this)">${f.label}</span>`
   ).join('');
-
   document.getElementById('display-fonts').innerHTML = DISPLAY_FONTS.map((f, i) =>
     `<span class="font-pill${i===0?' active':''}" style="font-family:${f.value}"
-      ontouchstart="applyDisplayFont(event,'${f.value}',this)"
-      onmousedown="applyDisplayFont(event,'${f.value}',this)">${f.label}</span>`
+      onpointerdown="applyDisplayFont(event,'${f.value}',this)">${f.label}</span>`
   ).join('');
 }
 
@@ -1637,12 +1612,13 @@ function applyTextFont(e, font, el) {
   el.classList.add('active');
   const area = document.getElementById('writing-area');
   const sel = window.getSelection();
-  // If text is selected inside the writing area, wrap it; otherwise set area default
   if (sel && !sel.isCollapsed && area.contains(sel.anchorNode)) {
     area.focus();
     wrapSelection('fontFamily', font);
   } else {
     area.style.fontFamily = font;
+    // Move caret to end so new typing uses the new font
+    area.focus();
   }
 }
 
@@ -1676,13 +1652,11 @@ function wrapSelection(styleProp, value) {
 function buildColorSwatches() {
   document.getElementById('color-swatches').innerHTML = COLORS.map(c =>
     `<div class="color-swatch" style="background:${c}"
-      ontouchstart="applyColor(event,'${c}',this)"
-      onmousedown="applyColor(event,'${c}',this)"></div>`
+      onpointerdown="applyColor(event,'${c}',this)"></div>`
   ).join('');
   document.getElementById('highlight-swatches').innerHTML = HIGHLIGHTS.map(h =>
     `<div class="highlight-swatch" style="background:${h}"
-      ontouchstart="applyHighlight(event,'${h}',this)"
-      onmousedown="applyHighlight(event,'${h}',this)"></div>`
+      onpointerdown="applyHighlight(event,'${h}',this)"></div>`
   ).join('');
 }
 
@@ -1709,7 +1683,9 @@ function insertList() {
   document.execCommand('insertHTML', false, '<br>• ');
 }
 
-// Legacy stubs — called from old inline handlers that may still exist in drafts
+// Legacy stubs
+function toggleToolbar() {}
+function saveSelectionNow() {}
 function toggleFormat(type) { doFmt({ preventDefault:()=>{} }, type); }
 function changeSize(dir) { doFmt({ preventDefault:()=>{} }, dir > 0 ? 'size+' : 'size-'); }
 function setTextFont(f, el) { applyTextFont({ preventDefault:()=>{} }, f, el); }
