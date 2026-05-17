@@ -13,6 +13,8 @@
 <meta name="apple-mobile-web-app-title" content="transitions">
 <meta name="application-name" content="transitions">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Montserrat:wght@300;400;500&family=Poppins:wght@300;400;500&family=Raleway:wght@300;400;500&family=Merriweather:ital,wght@0,300;0,400;1,300;1,400&family=Oswald:wght@300;400;500&family=Roboto+Slab:wght@300;400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Bebas+Neue&family=Chewy&family=Bagel+Fat+One&family=Dancing+Script:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
 <style>
 :root {
   --bg: #F0F2FA;
@@ -395,131 +397,65 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
   font-family: var(--font-display); font-style: italic; color: var(--accent);
 }
 
-/* ── Writing page layout ── */
-.writing-page-inner {
-  display: flex; flex-direction: column;
-  min-height: 100%;
-}
-
-/* Sticky bar at top — always above keyboard */
-.writing-top-bar {
-  position: sticky; top: 0; z-index: 10;
-  background: var(--bg2);
-  border-bottom: 0.5px solid var(--border);
-}
-
-/* Tab row */
-.fmt-tabs {
-  display: flex;
-}
-.fmt-tab {
-  flex: 1; padding: 9px 4px 8px;
-  font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--text-muted); font-family: var(--font-body); font-weight: 400;
-  text-align: center; cursor: pointer;
-  border-bottom: 1.5px solid transparent;
-  user-select: none; touch-action: manipulation;
-}
-.fmt-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-
-/* Save row inside top bar */
+/* ── Writing page ── */
+.writing-page-inner { display: flex; flex-direction: column; height: 100%; }
+.writing-top-bar { flex-shrink: 0; background: var(--bg2); border-bottom: 0.5px solid var(--border); }
 .writing-save-row {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 8px 16px 6px;
-  border-top: 0.5px solid var(--border-soft);
+  padding: 9px 18px 8px;
 }
 .writing-date-label { font-size: 11px; color: var(--text-muted); font-weight: 300; }
-
-/* Panels */
-.fmt-panel { display: none; padding: 10px 14px 12px; background: var(--accent-soft); }
-.fmt-panel.active { display: block; }
-
-.fmt-section-label {
-  font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--accent); margin-bottom: 6px; font-weight: 500;
-}
-.fmt-second-label { margin-top: 10px; }
-
-.fmt-font-row {
-  display: flex; gap: 6px; overflow-x: auto;
-  scrollbar-width: none; padding-bottom: 2px;
-  touch-action: pan-x;
-  touch-action: pan-x;
-}
-.fmt-font-row::-webkit-scrollbar { display: none; }
-
-.fmt-style-row { display: flex; gap: 6px; flex-wrap: wrap; }
-.fmt-swatch-row { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
-
-.font-pill {
-  touch-action: manipulation;
-  padding: 5px 12px; background: var(--card);
-  border: 0.5px solid var(--border); border-radius: 20px;
-  font-size: 12px; color: var(--text-soft); cursor: pointer;
-  white-space: nowrap; flex-shrink: 0;
-  touch-action: manipulation;
-}
-.font-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-
-.fmt-btn {
-  padding: 7px 13px; background: var(--card);
-  border: 0.5px solid var(--border); border-radius: var(--radius-sm);
-  font-size: 12px; color: var(--text-soft); cursor: pointer;
-  font-family: var(--font-body); touch-action: manipulation;
-}
-.fmt-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-
-.color-swatch {
-  width: 24px; height: 24px; border-radius: 50%; cursor: pointer;
-  border: 2px solid transparent; flex-shrink: 0;
-  touch-action: manipulation;
-}
-.color-swatch.active { border-color: var(--accent); outline: 2px solid var(--accent-mid); }
-
-.highlight-swatch {
-  width: 28px; height: 16px; border-radius: 4px; cursor: pointer;
-  border: 0.5px solid var(--border); flex-shrink: 0;
-  touch-action: manipulation;
-}
-.highlight-swatch.active { border-color: var(--accent); outline: 1px solid var(--accent); }
-
-.fmt-divider { height: 0.5px; background: var(--accent-mid); margin: 10px 0; }
-
-/* Writing content area — padded below the sticky bar */
-.writing-content {
-  padding: 16px 22px 120px;
-  flex: 1;
-}
-
+.writing-content { padding: 16px 22px 0; flex-shrink: 0; }
 .entry-context-display {
-  font-size: 11px; color: var(--text-muted);
-  font-style: italic; margin-bottom: 14px;
-  font-weight: 300; line-height: 1.5;
+  font-size: 11px; color: var(--text-muted); font-style: italic;
+  margin-bottom: 12px; font-weight: 300; line-height: 1.5;
 }
 .entry-context-display strong { color: var(--accent); font-weight: 400; font-style: normal; }
-
 .title-input {
   width: 100%; background: transparent; border: none;
-  border-bottom: 0.5px solid var(--border);
-  padding-bottom: 10px; margin-bottom: 16px;
+  border-bottom: 0.5px solid var(--border); padding-bottom: 10px; margin-bottom: 0;
   font-family: var(--font-display); font-size: 20px;
   color: var(--text); font-style: italic; font-weight: 400;
   outline: none; transition: border-color 0.2s;
 }
 .title-input::placeholder { color: var(--text-xmuted); }
 .title-input:focus { border-color: var(--accent-mid); }
-
-.writing-area {
-  width: 100%; background: transparent; border: none;
-  font-size: 15px; line-height: 1.85; color: var(--text);
-  outline: none; min-height: 200px;
-  font-family: var(--font-display);
-  word-break: break-word;
+.quill-wrap { flex: 1; display: flex; flex-direction: column; }
+/* Quill overrides */
+.ql-toolbar.ql-snow {
+  border: none; border-bottom: 0.5px solid var(--border);
+  background: var(--bg2); padding: 5px 12px; display: flex; flex-wrap: wrap; gap: 1px;
 }
-.writing-area:empty::before {
-  content: attr(data-placeholder);
-  color: var(--text-xmuted); pointer-events: none; font-style: italic;
+.ql-container.ql-snow {
+  border: none; flex: 1;
+  font-family: var(--font-display); font-size: 15px; color: var(--text); background: var(--bg);
 }
+.ql-editor { padding: 18px 22px 120px; line-height: 1.85; color: var(--text); font-family: inherit; font-weight: 300; }
+.ql-editor.ql-blank::before { color: var(--text-xmuted); font-style: italic; font-family: var(--font-display); left: 22px; right: 22px; }
+.ql-snow .ql-stroke { stroke: var(--text-muted); stroke-width: 1.5px; }
+.ql-snow .ql-fill, .ql-snow .ql-stroke.ql-fill { fill: var(--text-muted); }
+.ql-snow .ql-picker { color: var(--text-muted); font-family: var(--font-body); font-size: 11px; }
+.ql-snow .ql-picker-label { border-color: var(--border) !important; border-radius: 6px; padding: 2px 6px; }
+.ql-snow.ql-toolbar button { padding: 4px 5px; border-radius: 6px; }
+.ql-snow.ql-toolbar button:hover,
+.ql-snow.ql-toolbar button.ql-active { background: var(--accent-soft); }
+.ql-snow.ql-toolbar button:hover .ql-stroke,
+.ql-snow.ql-toolbar button.ql-active .ql-stroke { stroke: var(--accent); }
+.ql-snow.ql-toolbar button:hover .ql-fill,
+.ql-snow.ql-toolbar button.ql-active .ql-fill { fill: var(--accent); }
+.ql-snow .ql-picker-options {
+  background: var(--card); border: 0.5px solid var(--border) !important;
+  border-radius: var(--radius-sm); box-shadow: 0 4px 20px rgba(42,45,74,0.10); padding: 4px;
+}
+.ql-snow .ql-picker-item { border-radius: 4px; padding: 4px 8px; }
+.ql-snow .ql-picker-item:hover { background: var(--accent-soft); color: var(--accent); }
+.ql-snow .ql-picker-label:hover,
+.ql-snow .ql-picker.ql-expanded .ql-picker-label { color: var(--accent); border-color: var(--accent-mid) !important; }
+.ql-snow .ql-picker.ql-expanded .ql-picker-label .ql-stroke { stroke: var(--accent); }
+.ql-snow .ql-color-picker .ql-picker-options { padding: 6px; width: 192px; }
+.ql-snow .ql-color-picker .ql-picker-item { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid transparent; margin: 2px; }
+.ql-snow .ql-color-picker .ql-picker-item:hover,
+.ql-snow .ql-color-picker .ql-picker-item.ql-selected { border-color: var(--accent); transform: scale(1.15); }
 
 .sync-dot {
   position: fixed; top: 14px; right: 16px;
@@ -807,46 +743,7 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
     <!-- WRITING -->
     <div class="page" id="page-writing">
       <div class="writing-page-inner">
-
-        <!-- Sticky top bar: tabs + save row -->
         <div class="writing-top-bar">
-          <div class="fmt-tabs">
-            <div class="fmt-tab active" id="fmt-tab-font"  onpointerdown="switchTab(event,'font')">font</div>
-            <div class="fmt-tab"        id="fmt-tab-style" onpointerdown="switchTab(event,'style')">style</div>
-            <div class="fmt-tab"        id="fmt-tab-color" onpointerdown="switchTab(event,'color')">color</div>
-          </div>
-
-          <!-- Font panel -->
-          <div class="fmt-panel active" id="fmt-panel-font">
-            <div class="fmt-section-label">body text</div>
-            <div class="fmt-font-row" id="text-fonts"></div>
-            <div class="fmt-section-label fmt-second-label">title</div>
-            <div class="fmt-font-row" id="display-fonts"></div>
-          </div>
-
-          <!-- Style panel -->
-          <div class="fmt-panel" id="fmt-panel-style">
-            <div class="fmt-style-row">
-              <button class="fmt-btn" id="fmt-bold"    onpointerdown="doFmt(event,'bold')"><b>B</b></button>
-              <button class="fmt-btn" id="fmt-italic"  onpointerdown="doFmt(event,'italic')"><i>I</i></button>
-              <button class="fmt-btn" id="fmt-ul"      onpointerdown="doFmt(event,'list')">• list</button>
-              <button class="fmt-btn" id="fmt-size-up" onpointerdown="doFmt(event,'size+')">A+</button>
-              <button class="fmt-btn" id="fmt-size-dn" onpointerdown="doFmt(event,'size-')">A−</button>
-              <button class="fmt-btn" id="fmt-undo"    onpointerdown="doFmt(event,'undo')">↩</button>
-              <button class="fmt-btn" id="fmt-redo"    onpointerdown="doFmt(event,'redo')">↪</button>
-            </div>
-          </div>
-
-          <!-- Color panel -->
-          <div class="fmt-panel" id="fmt-panel-color">
-            <div class="fmt-section-label">text color</div>
-            <div class="fmt-swatch-row" id="color-swatches"></div>
-            <div class="fmt-divider"></div>
-            <div class="fmt-section-label">highlight</div>
-            <div class="fmt-swatch-row" id="highlight-swatches"></div>
-          </div>
-
-          <!-- Save row -->
           <div class="writing-save-row">
             <div class="writing-date-label" id="writing-date-label">—</div>
             <div class="writing-btn-row">
@@ -855,14 +752,11 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
             </div>
           </div>
         </div>
-
-        <!-- Scrollable writing content -->
         <div class="writing-content">
           <div class="entry-context-display" id="writing-context"></div>
           <input class="title-input" id="title-input" placeholder="title your morning…" />
-          <div class="writing-area" id="writing-area" contenteditable="true" data-placeholder="begin here…"></div>
         </div>
-
+        <div class="quill-wrap"><div id="quill-editor"></div></div>
       </div>
     </div>
 
@@ -1143,73 +1037,9 @@ function checkDraft() {
   }
 }
 
-function saveDraft() {
-  const title = document.getElementById('title-input').value.trim();
-  const area = document.getElementById('writing-area');
-  const body = area.innerHTML;
-  const bodyText = area.innerText.trim();
+function saveDraft() { /* defined in Quill section below */ }
 
-  const q = selectedQuestion ? QUESTIONS.find(q => q.id === selectedQuestion) : null;
-  const cats = ['protection', q ? q.category : null].filter(Boolean);
-
-  const draft = {
-    title,
-    body,
-    bodyText,
-    vibe: selectedVibe,
-    cats,
-    selectedQuestion,
-    anchorQ: ANCHOR.question,
-    secondQ: q ? q.text : null,
-    savedAt: new Date().toISOString(),
-    fontSize: currentFontSize,
-    textFont: activeTextFont,
-    displayFont: activeDisplayFont,
-  };
-
-  localStorage.setItem('transitions_draft', JSON.stringify(draft));
-  showPage('page-home');
-  checkDraft();
-  showToast('draft saved 🌙');
-}
-
-function resumeDraft() {
-  const raw = localStorage.getItem('transitions_draft');
-  if (!raw) return;
-  const draft = JSON.parse(raw);
-
-  selectedVibe = draft.vibe || null;
-  selectedQuestion = draft.selectedQuestion || null;
-  currentFontSize = draft.fontSize || 15;
-  activeTextFont = draft.textFont || TEXT_FONTS[0].value;
-  activeDisplayFont = draft.displayFont || DISPLAY_FONTS[0].value;
-
-  const q = selectedQuestion ? QUESTIONS.find(q => q.id === selectedQuestion) : null;
-  const cats = draft.cats || ['protection'];
-  const vibeText = draft.vibe || null;
-
-  let contextHTML = '';
-  if (vibeText) {
-    contextHTML = `arrived <strong>${vibeText}</strong> · wrote through ${cats.join(' + ')}`;
-  } else {
-    contextHTML = `wrote through ${cats.join(' + ')}`;
-  }
-
-  document.getElementById('writing-context').innerHTML = contextHTML;
-  document.getElementById('title-input').value = draft.title || '';
-  document.getElementById('title-input').style.fontFamily = activeDisplayFont;
-
-  const area = document.getElementById('writing-area');
-  area.innerHTML = draft.body || '';
-  area.style.fontFamily = activeTextFont;
-  area.style.fontSize = currentFontSize + 'px';
-
-  document.getElementById('writing-date-label').textContent =
-    new Date().toLocaleDateString('en-US', { weekday:'short', month:'long', day:'numeric' }).toLowerCase();
-
-  showPage('page-writing');
-  setTimeout(() => area.focus(), 300);
-}
+function resumeDraft() { /* defined in Quill section below */ }
 
 function clearDraft() {
   localStorage.removeItem('transitions_draft');
@@ -1389,128 +1219,128 @@ function selectQ(id) {
   row.classList.remove('dimmed');
 }
 
-// ── WRITING ───────────────────────────────────────────────────────────────
+// ── QUILL ─────────────────────────────────────────────────────────────────
+let quill = null;
+
+const Font = Quill.import('formats/font');
+Font.whitelist = ['playfair','montserrat','dm-sans','poppins','raleway','merriweather','roboto-slab'];
+Quill.register(Font, true);
+
+const fontCSSMap = {
+  playfair:     "'Playfair Display', Georgia, serif",
+  montserrat:   "'Montserrat', sans-serif",
+  'dm-sans':    "'DM Sans', sans-serif",
+  poppins:      "'Poppins', sans-serif",
+  raleway:      "'Raleway', sans-serif",
+  merriweather: "'Merriweather', Georgia, serif",
+  'roboto-slab':"'Roboto Slab', serif",
+};
+const _fs = document.createElement('style');
+_fs.textContent = Object.entries(fontCSSMap).map(([k,v]) =>
+  `.ql-font-${k}, .ql-font-${k} * { font-family: ${v} !important; }` +
+  `\n.ql-picker.ql-font .ql-picker-item[data-value="${k}"]::before,` +
+  `\n.ql-picker.ql-font .ql-picker-label[data-value="${k}"]::before { content: attr(data-value); font-family: ${v}; }`
+).join('\n');
+document.head.appendChild(_fs);
+
+function initQuill() {
+  if (quill) return;
+  quill = new Quill('#quill-editor', {
+    theme: 'snow',
+    placeholder: 'begin here\u2026',
+    modules: {
+      toolbar: [
+        [{ font: Font.whitelist }],
+        ['bold', 'italic'],
+        [{ color: ['#2A2D4A','#6A5AC0','#8A4A9A','#2A5A8A','#2A7A5A','#8A5A2A','#7A7A9A','#C0607A','#000000','#ffffff'] },
+         { background: ['#EAE8F8','#E8D8F0','#D8F0E8','#F0E8D8','#F8E8E8','#FDECC8','#E0E8F8',''] }],
+        [{ size: ['small', false, 'large', 'huge'] }],
+        [{ list: 'bullet' }],
+        ['clean'],
+      ],
+      history: { delay: 800, maxStack: 200, userOnly: true },
+    },
+  });
+}
+
 function goToWriting() {
   const q = selectedQuestion ? QUESTIONS.find(q => q.id === selectedQuestion) : null;
   const vibeText = selectedVibe || null;
   const cats = ['protection', q ? q.category : null].filter(Boolean);
-
-  let contextHTML = '';
-  if (vibeText) {
-    contextHTML = `arrived <strong>${vibeText}</strong> · wrote through ${cats.join(' + ')}`;
-  } else {
-    contextHTML = `wrote through ${cats.join(' + ')}`;
-  }
-  document.getElementById('writing-context').innerHTML = contextHTML;
+  document.getElementById('writing-context').innerHTML = vibeText
+    ? `arrived <strong>${vibeText}</strong> \u00b7 wrote through ${cats.join(' + ')}`
+    : `wrote through ${cats.join(' + ')}`;
   document.getElementById('title-input').value = '';
-  const area = document.getElementById('writing-area');
-  area.innerHTML = '';
-  area.style.fontFamily = activeTextFont;
-  area.style.fontSize = currentFontSize + 'px';
-  area.style.fontWeight = '300';
-  area.style.fontStyle = 'normal';
-  area.style.color = '';
-  area.style.background = '';
-  document.getElementById('fmt-bold').classList.remove('active');
-  document.getElementById('fmt-italic').classList.remove('active');
-  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.highlight-swatch').forEach(s => s.classList.remove('active'));
-  activeTextColor = null; activeHighlight = null;
+  document.getElementById('writing-date-label').textContent =
+    new Date().toLocaleDateString('en-US', { weekday:'short', month:'long', day:'numeric' }).toLowerCase();
   showPage('page-writing');
-  setTimeout(() => area.focus(), 300);
+  initQuill();
+  quill.setContents([]); quill.enable();
+  setTimeout(() => quill.focus(), 300);
 }
 
 function saveEntry() {
   const title = document.getElementById('title-input').value.trim();
-  const area = document.getElementById('writing-area');
-  const body = area.innerText.trim();
-  if (!body) { showToast('write something first ✨'); return; }
-
+  if (!quill) { showToast('write something first \u2728'); return; }
+  const bodyText = quill.getText().trim();
+  if (!bodyText) { showToast('write something first \u2728'); return; }
   const q = selectedQuestion ? QUESTIONS.find(q => q.id === selectedQuestion) : null;
-  const cats = ['protection', q ? q.category : null].filter(Boolean);
-
   const entry = {
     id: Date.now(),
     date: fmt(new Date()),
     dateDisplay: new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }),
     title: title || null,
-    body,
+    body: bodyText, bodyHTML: quill.root.innerHTML,
+    bodyDelta: JSON.stringify(quill.getContents()),
     vibe: selectedVibe,
-    cats,
-    anchorQ: ANCHOR.question,
-    secondQ: q ? q.text : null,
+    cats: ['protection', q ? q.category : null].filter(Boolean),
+    anchorQ: ANCHOR.question, secondQ: q ? q.text : null,
   };
-
-  appData.entries.unshift(entry);
-  save();
-  clearDraft();
-
-  document.getElementById('home-count').textContent = `${appData.entries.length} entries`;
+  appData.entries.unshift(entry); save(); clearDraft();
+  document.getElementById('home-count').textContent =
+    appData.entries.length === 1 ? '1 entry' : `${appData.entries.length} entries`;
   document.getElementById('lib-count').textContent = appData.entries.length;
   renderEntries();
-
-  selectedVibe = null;
-  selectedQuestion = null;
+  selectedVibe = null; selectedQuestion = null;
   document.querySelectorAll('.vibe-btn, .vibe-single').forEach(b => b.classList.remove('selected'));
   const btn = document.getElementById('vibe-next-btn');
   btn.style.opacity = '0.4'; btn.style.pointerEvents = 'none';
-
-  showPage('page-home');
-  showToast('entry saved ✨');
+  showPage('page-home'); showToast('entry saved \u2728');
 }
 
-// ── LIBRARY ───────────────────────────────────────────────────────────────
-function toggleLibrary() {
-  libraryOpen = !libraryOpen;
-  document.getElementById('library-panel').classList.toggle('open', libraryOpen);
-  document.getElementById('lib-arrow').classList.toggle('open', libraryOpen);
+function saveDraft() {
+  const title = document.getElementById('title-input').value.trim();
+  const q = selectedQuestion ? QUESTIONS.find(q => q.id === selectedQuestion) : null;
+  localStorage.setItem('transitions_draft', JSON.stringify({
+    title, body: quill ? quill.getText().trim() : '',
+    bodyHTML: quill ? quill.root.innerHTML : '',
+    bodyDelta: quill ? JSON.stringify(quill.getContents()) : '',
+    vibe: selectedVibe, cats: ['protection', q ? q.category : null].filter(Boolean),
+    selectedQuestion, anchorQ: ANCHOR.question, secondQ: q ? q.text : null,
+    savedAt: new Date().toISOString(),
+  }));
+  showPage('page-home'); checkDraft(); showToast('draft saved \uD83C\uDF19');
 }
 
-function toggleVibeFilter(vibe, el) {
-  const idx = activeVibeFilters.indexOf(vibe);
-  if (idx > -1) { activeVibeFilters.splice(idx, 1); el.className = 'filter-pill'; }
-  else { activeVibeFilters.push(vibe); el.className = `filter-pill active-vibe-${vibe}`; }
-  renderEntries();
-}
-
-function toggleCatFilter(cat, el) {
-  const idx = activeCatFilters.indexOf(cat);
-  if (idx > -1) { activeCatFilters.splice(idx, 1); el.className = 'filter-pill'; }
-  else { activeCatFilters.push(cat); el.className = 'filter-pill active-cat'; }
-  renderEntries();
-}
-
-function filterEntries() { renderEntries(); }
-
-function renderEntries() {
-  const query = (document.getElementById('search-input')?.value || '').toLowerCase();
-  let entries = [...appData.entries];
-
-  if (activeVibeFilters.length) entries = entries.filter(e => activeVibeFilters.includes(e.vibe));
-  if (activeCatFilters.length) entries = entries.filter(e => e.cats && e.cats.some(c => activeCatFilters.includes(c)));
-  if (query) entries = entries.filter(e =>
-    (e.title || '').toLowerCase().includes(query) ||
-    (e.body || '').toLowerCase().includes(query) ||
-    (e.date || '').toLowerCase().includes(query) ||
-    (e.vibe || '').toLowerCase().includes(query) ||
-    (e.cats || []).some(c => c.toLowerCase().includes(query))
-  );
-
-  const el = document.getElementById('entries-list');
-  if (!entries.length) { el.innerHTML = '<div class="no-entries">no entries found</div>'; return; }
-
-  el.innerHTML = entries.map(e => {
-    const catsStr = e.cats ? e.cats.join(' + ') : 'protection';
-    const vibeStr = e.vibe ? `arrived <strong>${e.vibe}</strong> · ` : '';
-    const titleDisplay = e.title || 'untitled';
-    return `<div class="entry-row" onclick="viewEntry(${e.id})">
-      <div class="entry-top">
-        <span class="entry-date">${e.dateDisplay || e.date}</span>
-        <span class="entry-title">${titleDisplay}</span>
-      </div>
-      <div class="entry-context-line">${vibeStr}wrote through ${catsStr}</div>
-    </div>`;
-  }).join('');
+function resumeDraft() {
+  const raw = localStorage.getItem('transitions_draft');
+  if (!raw) return;
+  const draft = JSON.parse(raw);
+  selectedVibe = draft.vibe || null; selectedQuestion = draft.selectedQuestion || null;
+  const cats = draft.cats || ['protection'];
+  document.getElementById('writing-context').innerHTML = draft.vibe
+    ? `arrived <strong>${draft.vibe}</strong> \u00b7 wrote through ${cats.join(' + ')}`
+    : `wrote through ${cats.join(' + ')}`;
+  document.getElementById('title-input').value = draft.title || '';
+  document.getElementById('writing-date-label').textContent =
+    new Date().toLocaleDateString('en-US', { weekday:'short', month:'long', day:'numeric' }).toLowerCase();
+  showPage('page-writing'); initQuill();
+  try {
+    if (draft.bodyDelta) quill.setContents(JSON.parse(draft.bodyDelta));
+    else if (draft.bodyHTML) quill.root.innerHTML = draft.bodyHTML;
+    else quill.setContents([]);
+  } catch(e) { quill.setContents([]); }
+  setTimeout(() => quill.focus(), 300);
 }
 
 function viewEntry(id) {
@@ -1518,216 +1348,23 @@ function viewEntry(id) {
   if (!entry) return;
   const wrap = document.getElementById('entry-viewer-wrap');
   const catsStr = entry.cats ? entry.cats.join(' + ') : 'protection';
-  const vibeStr = entry.vibe ? `arrived <strong>${entry.vibe}</strong> · ` : '';
+  const vibeStr = entry.vibe ? `arrived <strong>${entry.vibe}</strong> \u00b7 ` : '';
   wrap.style.display = 'block';
   wrap.innerHTML = `<div class="entry-viewer">
     <div class="viewer-context">${vibeStr}wrote through ${catsStr}</div>
     ${entry.title ? `<div class="viewer-title">${entry.title}</div>` : ''}
-    <div class="viewer-body">${entry.body}</div>
+    <div class="viewer-body">${entry.bodyHTML || entry.body}</div>
     <button class="viewer-close" onclick="closeViewer()">close</button>
   </div>`;
   wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function closeViewer() {
-  document.getElementById('entry-viewer-wrap').style.display = 'none';
-}
-
-function exportEntries() {
-  if (!appData.entries.length) { showToast('no entries to export'); return; }
-  const lines = appData.entries.map(e => {
-    const cats = e.cats ? e.cats.join(' + ') : 'protection';
-    const vibe = e.vibe ? `arrived: ${e.vibe} · ` : '';
-    const title = e.title ? `\n${e.title}` : '';
-    return `${e.dateDisplay || e.date}${title}\n${vibe}wrote through ${cats}\n\n${e.body}\n\n---`;
-  }).join('\n\n');
-  const blob = new Blob([lines], { type: 'text/plain' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url;
-  a.download = `transitions-${fmt(new Date())}.txt`; a.click();
-  URL.revokeObjectURL(url);
-  showToast('exported ✨');
-}
-
-// ── TOOLBAR ───────────────────────────────────────────────────────────────
-let activeFmtTab = 'font';
-
-function switchTab(e, tab) {
-  e.preventDefault();
-  activeFmtTab = tab;
-  document.querySelectorAll('.fmt-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.fmt-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('fmt-tab-' + tab).classList.add('active');
-  document.getElementById('fmt-panel-' + tab).classList.add('active');
-}
-
-// Track selection continuously so we can restore it after toolbar taps
-let _savedRange = null;
-document.addEventListener('selectionchange', () => {
-  const area = document.getElementById('writing-area');
-  if (!area) return;
-  const sel = window.getSelection();
-  if (sel && sel.rangeCount > 0 && area.contains(sel.anchorNode)) {
-    _savedRange = sel.getRangeAt(0).cloneRange();
-  }
-});
-
-function restoreSelection() {
-  if (!_savedRange) return false;
-  const area = document.getElementById('writing-area');
-  area.focus();
-  const sel = window.getSelection();
-  sel.removeAllRanges();
-  sel.addRange(_savedRange);
-  return !_savedRange.collapsed;
-}
-
-function doFmt(e, type) {
-  e.preventDefault();
-  const area = document.getElementById('writing-area');
-  restoreSelection();
-  if (type === 'bold') {
-    document.execCommand('bold', false, null);
-    document.getElementById('fmt-bold').classList.toggle('active', document.queryCommandState('bold'));
-  } else if (type === 'italic') {
-    document.execCommand('italic', false, null);
-    document.getElementById('fmt-italic').classList.toggle('active', document.queryCommandState('italic'));
-  } else if (type === 'list') {
-    document.execCommand('insertHTML', false, '<br>• ');
-  } else if (type === 'size+') {
-    currentFontSize = Math.min(28, currentFontSize + 1);
-    applyFontSize(currentFontSize);
-  } else if (type === 'size-') {
-    currentFontSize = Math.max(11, currentFontSize - 1);
-    applyFontSize(currentFontSize);
-  } else if (type === 'undo') {
-    document.execCommand('undo', false, null);
-  } else if (type === 'redo') {
-    document.execCommand('redo', false, null);
-  }
-}
-
-function applyFontSize(px) {
-  document.execCommand('fontSize', false, '7');
-  document.getElementById('writing-area').querySelectorAll('font[size="7"]').forEach(f => {
-    const span = document.createElement('span');
-    span.style.fontSize = px + 'px';
-    span.innerHTML = f.innerHTML;
-    f.replaceWith(span);
-  });
-}
-
-function buildFontPills() {
-  document.getElementById('text-fonts').innerHTML = TEXT_FONTS.map((f, i) =>
-    `<button class="font-pill${i===0?' active':''}" style="font-family:${f.value}"
-      onclick="applyTextFont(event,'${f.value}',this)">${f.label}</button>`
-  ).join('');
-  document.getElementById('display-fonts').innerHTML = DISPLAY_FONTS.map((f, i) =>
-    `<button class="font-pill${i===0?' active':''}" style="font-family:${f.value}"
-      onclick="applyDisplayFont(event,'${f.value}',this)">${f.label}</button>`
-  ).join('');
-}
-
-function applyTextFont(e, font, el) {
-  e.preventDefault();
-  activeTextFont = font;
-  document.querySelectorAll('#text-fonts .font-pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  const area = document.getElementById('writing-area');
-  const hadSelection = restoreSelection();
-  const sel = window.getSelection();
-  if (hadSelection && sel && !sel.isCollapsed && area.contains(sel.anchorNode)) {
-    wrapSelection('fontFamily', font);
-  } else {
-    // No selection — set the div default AND insert a zero-width span at cursor
-    // so new characters typed inherit the chosen font
-    area.style.fontFamily = font;
-    area.focus();
-    const sel2 = window.getSelection();
-    if (sel2 && sel2.rangeCount > 0 && area.contains(sel2.anchorNode)) {
-      const range = sel2.getRangeAt(0);
-      const anchor = document.createElement('span');
-      anchor.style.fontFamily = font;
-      anchor.appendChild(document.createTextNode('​')); // zero-width space
-      range.insertNode(anchor);
-      // Place caret inside the span so typing flows into it
-      const r2 = document.createRange();
-      r2.setStart(anchor.firstChild, 1);
-      r2.collapse(true);
-      sel2.removeAllRanges();
-      sel2.addRange(r2);
-    }
-  }
-}
-
-function applyDisplayFont(e, font, el) {
-  e.preventDefault();
-  activeDisplayFont = font;
-  document.querySelectorAll('#display-fonts .font-pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('title-input').style.fontFamily = font;
-}
-
-function wrapSelection(styleProp, value) {
-  const sel = window.getSelection();
-  if (!sel || sel.isCollapsed || sel.rangeCount === 0) return;
-  const range = sel.getRangeAt(0);
-  const span = document.createElement('span');
-  span.style[styleProp] = value;
-  try {
-    range.surroundContents(span);
-  } catch(err) {
-    const frag = range.extractContents();
-    span.appendChild(frag);
-    range.insertNode(span);
-  }
-  const r2 = document.createRange();
-  r2.selectNodeContents(span);
-  sel.removeAllRanges();
-  sel.addRange(r2);
-}
-
-function buildColorSwatches() {
-  document.getElementById('color-swatches').innerHTML = COLORS.map(c =>
-    `<div class="color-swatch" style="background:${c}"
-      onpointerdown="applyColor(event,'${c}',this)"></div>`
-  ).join('');
-  document.getElementById('highlight-swatches').innerHTML = HIGHLIGHTS.map(h =>
-    `<div class="highlight-swatch" style="background:${h}"
-      onpointerdown="applyHighlight(event,'${h}',this)"></div>`
-  ).join('');
-}
-
-function applyColor(e, color, el) {
-  e.preventDefault();
-  document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
-  el.classList.add('active');
-  activeTextColor = color;
-  document.getElementById('writing-area').focus();
-  document.execCommand('foreColor', false, color);
-}
-
-function applyHighlight(e, color, el) {
-  e.preventDefault();
-  document.querySelectorAll('.highlight-swatch').forEach(s => s.classList.remove('active'));
-  el.classList.add('active');
-  activeHighlight = color;
-  document.getElementById('writing-area').focus();
-  document.execCommand('hiliteColor', false, color);
-}
-
-function insertList() {
-  document.getElementById('writing-area').focus();
-  document.execCommand('insertHTML', false, '<br>• ');
-}
-
-// Legacy stubs
-function toggleToolbar() {}
-function saveSelectionNow() {}
-function toggleFormat(type) { doFmt({ preventDefault:()=>{} }, type); }
-function changeSize(dir) { doFmt({ preventDefault:()=>{} }, dir > 0 ? 'size+' : 'size-'); }
-function setTextFont(f, el) { applyTextFont({ preventDefault:()=>{} }, f, el); }
-function setDisplayFont(f, el) { applyDisplayFont({ preventDefault:()=>{} }, f, el); }
+function buildFontPills() {}
+function buildColorSwatches() {}
+function switchTab() {} function doFmt() {} function toggleToolbar() {}
+function saveSelectionNow() {} function toggleFormat() {} function changeSize() {}
+function setTextFont() {} function setDisplayFont() {}
+function insertList() { if (quill) quill.format('list','bullet'); }
 </script>
 </body>
 </html>
