@@ -167,7 +167,7 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
   overflow: hidden; max-height: 0;
   transition: max-height 0.4s ease;
 }
-.library-panel.open { max-height: 600px; }
+.library-panel.open { max-height: 2000px; }
 .library-inner {
   background: var(--bg3); border-radius: var(--radius);
   border: 0.5px solid var(--border);
@@ -1300,30 +1300,79 @@ function initQuill() {
         ['clean'],
       ],
       history: { delay: 800, maxStack: 200, userOnly: true },
-      keyboard: {
-        bindings: {
-          'undo': { key: 'Z', shortKey: true, handler() { quill.history.undo(); } },
-          'redo': { key: 'Z', shortKey: true, shiftKey: true, handler() { quill.history.redo(); } },
-        }
-      }
     },
   });
 
-  // Add undo/redo buttons to toolbar after init
-  const toolbar = quill.getModule('toolbar');
-  const tbEl = toolbar.container;
-  const undoRedoGroup = document.createElement('span');
-  undoRedoGroup.className = 'ql-formats';
-  undoRedoGroup.innerHTML = `
+  const tbEl = quill.getModule('toolbar').container;
+
+  // ── Teleport dropdowns to <body> so overflow:auto can't clip them ──────
+  // Quill keeps picker-options inside the toolbar; we move them to body
+  // whenever a picker opens, position them under their label, and move
+  // them back when they close (so Quill's internal state stays intact).
+  function teleportOpen(picker) {
+    const options = picker.querySelector('.ql-picker-options');
+    const label   = picker.querySelector('.ql-picker-label');
+    if (!options || !label || options._teleported) return;
+
+    const r = label.getBoundingClientRect();
+    // Style before moving so dimensions are available
+    options.style.position = 'fixed';
+    options.style.zIndex   = '99999';
+    options.style.top      = (r.bottom + 4) + 'px';
+
+    document.body.appendChild(options);
+    options._teleported  = true;
+    options._origParent  = picker;
+
+    // Horizontal: align to label, clamp inside viewport
+    const w   = options.offsetWidth || 160;
+    let left  = r.left;
+    if (left + w > window.innerWidth - 8) left = window.innerWidth - w - 8;
+    options.style.left = left + 'px';
+  }
+
+  function teleportClose(picker) {
+    const options = picker.querySelector('.ql-picker-options') ||
+                    [...document.body.querySelectorAll('.ql-picker-options')]
+                      .find(o => o._origParent === picker);
+    if (!options || !options._teleported) return;
+    picker.appendChild(options);
+    options.style.position = '';
+    options.style.zIndex   = '';
+    options.style.top      = '';
+    options.style.left     = '';
+    options._teleported    = false;
+  }
+
+  // Watch picker open/close via MutationObserver on the toolbar
+  const mo = new MutationObserver(() => {
+    tbEl.querySelectorAll('.ql-picker').forEach(picker => {
+      if (picker.classList.contains('ql-expanded')) {
+        teleportOpen(picker);
+      } else {
+        teleportClose(picker);
+      }
+    });
+  });
+  mo.observe(tbEl, { attributes: true, subtree: true, attributeFilter: ['class'] });
+
+  // ── Undo / Redo / Select-all ────────────────────────────────────────────
+  const extraGroup = document.createElement('span');
+  extraGroup.className = 'ql-formats';
+  extraGroup.innerHTML = `
     <button class="ql-undo" title="Undo">
       <svg viewBox="0 0 18 18"><polygon class="ql-fill ql-stroke" points="6 10 4 12 2 10 6 10"></polygon><path class="ql-stroke" d="M8.09,13.91A4.6,4.6,0,0,0,9,14,5,5,0,1,0,4,9"></path></svg>
     </button>
     <button class="ql-redo" title="Redo">
       <svg viewBox="0 0 18 18"><polygon class="ql-fill ql-stroke" points="12 10 14 12 16 10 12 10"></polygon><path class="ql-stroke" d="M9.91,13.91A4.6,4.6,0,0,1,9,14,5,5,0,1,1,14,9"></path></svg>
-    </button>`;
-  tbEl.appendChild(undoRedoGroup);
-  undoRedoGroup.querySelector('.ql-undo').addEventListener('click', () => quill.history.undo());
-  undoRedoGroup.querySelector('.ql-redo').addEventListener('click', () => quill.history.redo());
+    </button>
+    <button class="ql-selectall" title="Select all" style="width:auto;padding:3px 7px;font-size:10px;font-family:var(--font-body);letter-spacing:0.04em">all</button>`;
+  tbEl.appendChild(extraGroup);
+  extraGroup.querySelector('.ql-undo').addEventListener('click', () => quill.history.undo());
+  extraGroup.querySelector('.ql-redo').addEventListener('click', () => quill.history.redo());
+  extraGroup.querySelector('.ql-selectall').addEventListener('click', () => {
+    quill.setSelection(0, quill.getLength());
+  });
 }
 
 function buildFontPills() {
