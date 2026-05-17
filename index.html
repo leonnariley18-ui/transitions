@@ -38,7 +38,7 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; overflow: hidden; background: var(--bg); }
-body { font-family: var(--font-body); font-weight: 300; color: var(--text); overscroll-behavior: none; }
+body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
 
 .app {
   display: flex; flex-direction: column;
@@ -51,6 +51,7 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); over
   flex: 1; overflow-y: auto; overflow-x: hidden;
   padding: 0; scrollbar-width: none;
   height: 100%;
+  overscroll-behavior-y: auto;
 }
 .screen::-webkit-scrollbar { display: none; }
 
@@ -429,63 +430,38 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); over
   font-size: 15px; line-height: 1.85; color: var(--text);
   outline: none; min-height: 200px;
   font-family: var(--font-display);
-  word-break: break-word;
+  word-break: break-word; white-space: pre-wrap;
 }
 .writing-area:empty::before {
   content: attr(data-placeholder);
   color: var(--text-xmuted); pointer-events: none; font-style: italic;
 }
 
-
-/* Fixed formatting bar - sits at top of writing screen, above keyboard */
-.fmt-bar {
-  display: none; /* shown only when writing page is active */
-  position: fixed;
-  top: 0; left: 50%; transform: translateX(-50%);
-  width: 100%; max-width: 480px;
-  background: var(--bg2);
-  border-bottom: 0.5px solid var(--border);
-  z-index: 100;
-  overflow: hidden;
+.toolbar-toggle-bar {
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; padding: 10px 0 6px;
+  border-top: 0.5px solid var(--border); margin-top: 16px;
+  cursor: pointer; user-select: none;
 }
-.fmt-bar.visible { display: block; }
+.toolbar-toggle-label { font-size: 10px; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; }
+.toolbar-toggle-icon { font-size: 13px; color: var(--text-muted); transition: transform 0.25s; }
+.toolbar-toggle-icon.open { transform: rotate(180deg); }
 
-.fmt-bar-tabs {
-  display: flex;
-  border-bottom: 0.5px solid var(--border-soft);
+.toolbar-panel {
+  background: var(--accent-soft); border-radius: var(--radius);
+  border: 0.5px solid var(--accent-mid);
+  padding: 14px 16px; margin-top: 8px;
+  overflow: hidden; max-height: 0;
+  transition: max-height 0.35s ease, padding 0.35s ease;
 }
-.fmt-tab {
-  flex: 1; padding: 9px 4px 7px;
+.toolbar-panel.open { max-height: 400px; padding: 14px 16px; }
+
+.toolbar-section-label {
   font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--text-muted); font-family: var(--font-body); font-weight: 400;
-  text-align: center; cursor: pointer;
-  border-bottom: 1.5px solid transparent;
-  transition: all 0.15s; user-select: none;
+  color: var(--accent); margin-bottom: 8px; font-weight: 500;
 }
-.fmt-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-
-.fmt-panels { overflow: hidden; }
-.fmt-panel { display: none; padding: 8px 14px 10px; }
-.fmt-panel.active { display: block; }
-
-/* Text font panel */
-.fmt-font-scroll {
-  display: flex; gap: 6px; overflow-x: auto;
-  scrollbar-width: none; padding-bottom: 2px;
-}
-.fmt-font-scroll::-webkit-scrollbar { display: none; }
-
-/* Style panel */
-.fmt-style-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-
-/* Color panel */
-.fmt-color-section { margin-bottom: 8px; }
-.fmt-color-label {
-  font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--text-muted); margin-bottom: 6px; font-weight: 400;
-}
-.fmt-swatch-row { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
-
+.font-scroll { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; margin-bottom: 12px; }
+.font-scroll::-webkit-scrollbar { display: none; }
 .font-pill {
   padding: 5px 12px; background: var(--card);
   border: 0.5px solid var(--border); border-radius: 20px;
@@ -495,8 +471,9 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); over
 }
 .font-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
+.format-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
 .fmt-btn {
-  padding: 7px 13px; background: var(--card);
+  padding: 6px 12px; background: var(--card);
   border: 0.5px solid var(--border); border-radius: var(--radius-sm);
   font-size: 12px; color: var(--text-soft); cursor: pointer;
   transition: all 0.15s; font-family: var(--font-body);
@@ -504,32 +481,52 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); over
 .fmt-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 .fmt-btn:active { transform: scale(0.95); }
 
+.toolbar-divider { height: 0.5px; background: var(--accent-mid); margin: 8px 0 12px; }
+
+.color-row { display: flex; gap: 7px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
 .color-swatch {
   width: 22px; height: 22px; border-radius: 50%; cursor: pointer;
   border: 2px solid transparent; transition: all 0.15s; flex-shrink: 0;
 }
 .color-swatch.active { border-color: var(--accent); transform: scale(1.15); }
 
+.highlight-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
 .highlight-swatch {
-  width: 26px; height: 14px; border-radius: 4px; cursor: pointer;
+  width: 26px; height: 16px; border-radius: 4px; cursor: pointer;
   border: 0.5px solid var(--border); transition: all 0.15s; flex-shrink: 0;
 }
 .highlight-swatch.active { border-color: var(--accent); transform: scale(1.1); }
 
-/* Push writing screen content below the fixed bar */
-.writing-screen-inner {
-  padding: 106px 22px 40px; /* extra top padding = bar height */
+.sync-wrap {
+  position: fixed; top: 10px; right: 14px;
+  z-index: 200; display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
 }
-
 .sync-dot {
-  position: fixed; top: 14px; right: 16px;
   width: 7px; height: 7px; border-radius: 50%;
-  background: #5A9A6A; opacity: 0.7; z-index: 50;
-  transition: background 0.3s;
+  background: #5A9A6A; opacity: 0.7;
+  transition: background 0.3s, opacity 0.2s, transform 0.15s;
+  cursor: pointer;
 }
+.sync-dot:active { transform: scale(1.4); opacity: 1; }
 .sync-dot.syncing { background: #C4A02A; animation: sdpulse 1s ease infinite; opacity: 0.8; }
 .sync-dot.error { background: #C46060; opacity: 1; }
 @keyframes sdpulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
+
+.sync-menu {
+  display: none; flex-direction: column; gap: 4px; align-items: flex-end;
+}
+.sync-menu.open { display: flex; animation: fadeIn 0.15s ease; }
+.sync-menu-btn {
+  font-size: 10px; letter-spacing: 0.04em;
+  color: var(--text-soft); background: var(--card);
+  border: 0.5px solid var(--border); border-radius: 20px;
+  padding: 5px 10px; cursor: pointer;
+  font-family: var(--font-body); font-weight: 300;
+  white-space: nowrap; transition: all 0.15s;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+}
+.sync-menu-btn:active { background: var(--bg3); transform: scale(0.97); }
+.sync-menu-btn.danger { color: #C46060; }
 
 .pdot {
   width: 13px; height: 13px; border-radius: 50%;
@@ -618,8 +615,13 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); over
 </head>
 <body>
 
-<!-- Sync dot -->
-<div class="sync-dot" id="sync-dot"></div>
+<!-- Sync control -->
+<div class="sync-wrap" id="sync-wrap">
+  <div class="sync-dot" id="sync-dot" onclick="toggleSyncMenu()"></div>
+  <div class="sync-menu" id="sync-menu">
+    <div class="sync-menu-btn" onclick="forceSync()">sync</div>
+  </div>
+</div>
 
 <!-- PIN screen -->
 <div id="pin-screen" style="display:none; position:fixed; inset:0; background:var(--bg); z-index:999; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; gap:0;">
@@ -649,46 +651,6 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); over
 </div>
 
 <div class="app">
-
-  <!-- Fixed formatting bar (writing screen only) -->
-  <div class="fmt-bar" id="fmt-bar">
-    <div class="fmt-bar-tabs">
-      <div class="fmt-tab active" id="fmt-tab-font" onclick="switchFmtTab('font')">font</div>
-      <div class="fmt-tab" id="fmt-tab-style" onclick="switchFmtTab('style')">style</div>
-      <div class="fmt-tab" id="fmt-tab-color" onclick="switchFmtTab('color')">color</div>
-    </div>
-    <div class="fmt-panels">
-      <!-- Font panel -->
-      <div class="fmt-panel active" id="fmt-panel-font">
-        <div class="fmt-color-label" style="margin-bottom:4px">body</div>
-        <div class="fmt-font-scroll" id="text-fonts"></div>
-        <div class="fmt-color-label" style="margin-bottom:4px;margin-top:6px">title</div>
-        <div class="fmt-font-scroll" id="display-fonts"></div>
-      </div>
-      <!-- Style panel -->
-      <div class="fmt-panel" id="fmt-panel-style">
-        <div class="fmt-style-row">
-          <button class="fmt-btn" id="fmt-bold" onmousedown="fmtMouseDown(event,'bold')" ontouchstart="fmtMouseDown(event,'bold')"><b>B</b></button>
-          <button class="fmt-btn" id="fmt-italic" onmousedown="fmtMouseDown(event,'italic')" ontouchstart="fmtMouseDown(event,'italic')"><i>I</i></button>
-          <button class="fmt-btn" id="fmt-ul" onmousedown="fmtMouseDown(event,'list')" ontouchstart="fmtMouseDown(event,'list')">• list</button>
-          <button class="fmt-btn" id="fmt-size-up" onmousedown="fmtMouseDown(event,'size+',event)" ontouchstart="fmtMouseDown(event,'size+')">Aa↑</button>
-          <button class="fmt-btn" id="fmt-size-dn" onmousedown="fmtMouseDown(event,'size-')" ontouchstart="fmtMouseDown(event,'size-')">Aa↓</button>
-        </div>
-      </div>
-      <!-- Color panel -->
-      <div class="fmt-panel" id="fmt-panel-color">
-        <div class="fmt-color-section">
-          <div class="fmt-color-label">text color</div>
-          <div class="fmt-swatch-row" id="color-swatches"></div>
-        </div>
-        <div class="fmt-color-section">
-          <div class="fmt-color-label">highlight</div>
-          <div class="fmt-swatch-row" id="highlight-swatches"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <div class="screen">
 
     <!-- HOME -->
@@ -840,7 +802,7 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); over
 
     <!-- WRITING -->
     <div class="page" id="page-writing">
-      <div class="writing-screen-inner">
+      <div class="screen-inner">
         <div class="writing-header">
           <div class="writing-date-label" id="writing-date-label">—</div>
           <div class="writing-btn-row">
@@ -854,6 +816,35 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); over
         <input class="title-input" id="title-input" placeholder="title your morning…" />
 
         <div class="writing-area" id="writing-area" contenteditable="true" data-placeholder="begin here…"></div>
+
+        <div class="toolbar-toggle-bar" onmousedown="savedRange=saveSelection()" ontouchstart="savedRange=saveSelection()" onclick="toggleToolbar()">
+          <span class="toolbar-toggle-label">formatting</span>
+          <span class="toolbar-toggle-icon" id="toolbar-toggle-icon">▾</span>
+        </div>
+
+        <div class="toolbar-panel" id="toolbar-panel">
+          <div class="toolbar-section-label">text font</div>
+          <div class="font-scroll" id="text-fonts"></div>
+
+          <div class="toolbar-section-label">display font</div>
+          <div class="font-scroll" id="display-fonts"></div>
+
+          <div class="format-row">
+            <button class="fmt-btn" id="fmt-bold" onclick="toggleFormat('bold')"><b>B</b></button>
+            <button class="fmt-btn" id="fmt-italic" onclick="toggleFormat('italic')"><i>I</i></button>
+            <button class="fmt-btn" id="fmt-ul" onclick="insertList()">• list</button>
+            <button class="fmt-btn" id="fmt-size-up" onclick="changeSize(1)">Aa↑</button>
+            <button class="fmt-btn" id="fmt-size-dn" onclick="changeSize(-1)">Aa↓</button>
+          </div>
+
+          <div class="toolbar-divider"></div>
+
+          <div class="toolbar-section-label">text color</div>
+          <div class="color-row" id="color-swatches"></div>
+
+          <div class="toolbar-section-label" style="margin-top:10px">highlight</div>
+          <div class="highlight-row" id="highlight-swatches"></div>
+        </div>
       </div>
     </div>
 
@@ -976,6 +967,49 @@ function setSyncDot(state) {
   dot.className = 'sync-dot' + (state ? ' ' + state : '');
 }
 
+let syncMenuOpen = false;
+function toggleSyncMenu() {
+  syncMenuOpen = !syncMenuOpen;
+  document.getElementById('sync-menu').classList.toggle('open', syncMenuOpen);
+  if (syncMenuOpen) {
+    // Close on outside tap
+    setTimeout(() => document.addEventListener('click', closeSyncMenuOutside, { once: true }), 0);
+  }
+}
+function closeSyncMenuOutside(e) {
+  const wrap = document.getElementById('sync-wrap');
+  if (!wrap.contains(e.target)) {
+    syncMenuOpen = false;
+    document.getElementById('sync-menu').classList.remove('open');
+  }
+}
+
+async function forceSync() {
+  syncMenuOpen = false;
+  document.getElementById('sync-menu').classList.remove('open');
+  if (!USER_TOKEN) { showToast('not signed in'); return; }
+  setSyncDot('syncing');
+  try {
+    // Push local first, then pull fresh state back
+    await saveToSupabase(appData);
+    appData = await loadFromSupabase();
+    setSyncDot('');
+    document.getElementById('home-count').textContent =
+      appData.entries.length === 0 ? 'no entries yet — begin below' :
+      appData.entries.length === 1 ? '1 entry' : `${appData.entries.length} entries`;
+    document.getElementById('lib-count').textContent = appData.entries.length;
+    renderEntries();
+    showToast('synced ✓');
+  } catch(e) {
+    setSyncDot('error');
+    showToast('sync failed — check connection');
+  }
+}
+
+function forceRefresh() {
+  window.location.reload();
+}
+
 let appData = { entries: [] };
 let selectedVibe = null;
 let selectedQuestion = null;
@@ -985,6 +1019,7 @@ let activeHighlight = null;
 let activeVibeFilters = [];
 let activeCatFilters = [];
 let libraryOpen = false;
+let toolbarOpen = false;
 let openInfoId = null;
 
 const TEXT_FONTS = [
@@ -1009,6 +1044,23 @@ const HIGHLIGHTS = ['#E0E8F8','#E8D8F0','#D8F0E8','#F0E8D8','#F8E8E8','#FDECC8']
 
 let activeTextFont = TEXT_FONTS[0].value;
 let activeDisplayFont = DISPLAY_FONTS[0].value;
+let savedRange = null;
+
+function saveSelection() {
+  const sel = window.getSelection();
+  if (sel && sel.rangeCount > 0) return sel.getRangeAt(0).cloneRange();
+  return null;
+}
+
+function restoreSelection() {
+  const area = document.getElementById('writing-area');
+  area.focus();
+  if (savedRange) {
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(savedRange);
+  }
+}
 
 function save() {
   localStorage.setItem('transitions_v1', JSON.stringify(appData));
@@ -1267,15 +1319,9 @@ function showPage(id) {
   document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); });
   const page = document.getElementById(id);
   page.classList.add('active');
-  page.querySelector('.writing-screen-inner, .screen-inner')?.scrollTo(0,0);
+  page.querySelector('.screen-inner')?.scrollTo(0,0);
   const screen = document.querySelector('.screen');
   screen.scrollTo(0,0);
-  // Show formatting bar only on writing page
-  if (id === 'page-writing') {
-    showFmtBar();
-  } else {
-    hideFmtBar();
-  }
 }
 
 function goBack(targetPage) { showPage(targetPage); }
@@ -1546,111 +1592,71 @@ function exportEntries() {
   showToast('exported ✨');
 }
 
-// ── FORMATTING BAR ────────────────────────────────────────────────────────
-let activeFmtTab = 'font';
-
-function showFmtBar() {
-  document.getElementById('fmt-bar').classList.add('visible');
-}
-function hideFmtBar() {
-  document.getElementById('fmt-bar').classList.remove('visible');
-}
-
-function switchFmtTab(tab) {
-  activeFmtTab = tab;
-  document.querySelectorAll('.fmt-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.fmt-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('fmt-tab-' + tab).classList.add('active');
-  document.getElementById('fmt-panel-' + tab).classList.add('active');
-}
-
-// All format buttons use onmousedown/ontouchstart so they fire BEFORE
-// the writing area loses focus, preserving the selection.
-function fmtMouseDown(e, type) {
-  e.preventDefault(); // prevent blur on writing area
-  const area = document.getElementById('writing-area');
-  area.focus();
-  if (type === 'bold') {
-    document.execCommand('bold', false, null);
-    document.getElementById('fmt-bold').classList.toggle('active', document.queryCommandState('bold'));
-  } else if (type === 'italic') {
-    document.execCommand('italic', false, null);
-    document.getElementById('fmt-italic').classList.toggle('active', document.queryCommandState('italic'));
-  } else if (type === 'list') {
-    document.execCommand('insertHTML', false, '<br>• ');
-  } else if (type === 'size+') {
-    currentFontSize = Math.min(22, currentFontSize + 1);
-    document.execCommand('fontSize', false, '7'); // placeholder
-    // Replace font size 7 spans with correct px size
-    area.querySelectorAll('font[size="7"]').forEach(f => {
-      const span = document.createElement('span');
-      span.style.fontSize = currentFontSize + 'px';
-      span.innerHTML = f.innerHTML;
-      f.replaceWith(span);
-    });
-  } else if (type === 'size-') {
-    currentFontSize = Math.max(11, currentFontSize - 1);
-    document.execCommand('fontSize', false, '7');
-    area.querySelectorAll('font[size="7"]').forEach(f => {
-      const span = document.createElement('span');
-      span.style.fontSize = currentFontSize + 'px';
-      span.innerHTML = f.innerHTML;
-      f.replaceWith(span);
-    });
+// ── TOOLBAR ───────────────────────────────────────────────────────────────
+function toggleToolbar() {
+  toolbarOpen = !toolbarOpen;
+  document.getElementById('toolbar-panel').classList.toggle('open', toolbarOpen);
+  document.getElementById('toolbar-toggle-icon').classList.toggle('open', toolbarOpen);
+  if (toolbarOpen) {
+    // Save selection before dismissing keyboard, then blur to hide keyboard
+    savedRange = saveSelection();
+    document.getElementById('writing-area').blur();
+    // Scroll toolbar into view
+    setTimeout(() => {
+      document.getElementById('toolbar-panel').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
   }
 }
 
 function buildFontPills() {
   const textEl = document.getElementById('text-fonts');
   textEl.innerHTML = TEXT_FONTS.map((f, i) =>
-    `<span class="font-pill${i===0?' active':''}" style="font-family:${f.value}" onmousedown="applyTextFont(event,'${f.value}',this)" ontouchstart="applyTextFont(event,'${f.value}',this)">${f.label}</span>`
+    `<span class="font-pill${i===0?' active':''}" style="font-family:${f.value}" onclick="setTextFont('${f.value}',this)">${f.label}</span>`
   ).join('');
 
   const dispEl = document.getElementById('display-fonts');
   dispEl.innerHTML = DISPLAY_FONTS.map((f, i) =>
-    `<span class="font-pill${i===0?' active':''}" style="font-family:${f.value}" onmousedown="applyDisplayFont(event,'${f.value}',this)" ontouchstart="applyDisplayFont(event,'${f.value}',this)">${f.label}</span>`
+    `<span class="font-pill${i===0?' active':''}" style="font-family:${f.value}" onclick="setDisplayFont('${f.value}',this)">${f.label}</span>`
   ).join('');
 }
 
-function applyTextFont(e, font, el) {
-  e.preventDefault();
+function setTextFont(font, el) {
   activeTextFont = font;
   document.querySelectorAll('#text-fonts .font-pill').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
   const area = document.getElementById('writing-area');
+  // Apply to selection if there is one, otherwise set as default for new text
   const sel = window.getSelection();
-  if (sel && !sel.isCollapsed) {
-    // Has selection — wrap in span
-    area.focus();
-    wrapSelectionInSpan('fontFamily', font);
+  if (sel && !sel.isCollapsed && area.contains(sel.anchorNode)) {
+    applyStyleToSelection('fontFamily', font);
   } else {
-    // No selection — change whole area default
+    // Set whole area default font (no text selected)
     area.style.fontFamily = font;
   }
 }
 
-function applyDisplayFont(e, font, el) {
-  e.preventDefault();
+function setDisplayFont(font, el) {
   activeDisplayFont = font;
   document.querySelectorAll('#display-fonts .font-pill').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
   document.getElementById('title-input').style.fontFamily = font;
 }
 
-function wrapSelectionInSpan(styleProp, value) {
+function applyStyleToSelection(styleProp, value) {
   const sel = window.getSelection();
-  if (!sel || sel.isCollapsed || sel.rangeCount === 0) return;
+  if (!sel || sel.isCollapsed) return;
   const range = sel.getRangeAt(0);
   const span = document.createElement('span');
   span.style[styleProp] = value;
   try {
     range.surroundContents(span);
   } catch(e) {
+    // If surroundContents fails (cross-node selection), extract and wrap
     const fragment = range.extractContents();
     span.appendChild(fragment);
     range.insertNode(span);
   }
-  // Re-select the wrapped content
+  // Restore selection
   const newRange = document.createRange();
   newRange.selectNodeContents(span);
   sel.removeAllRanges();
@@ -1659,43 +1665,65 @@ function wrapSelectionInSpan(styleProp, value) {
 
 function buildColorSwatches() {
   document.getElementById('color-swatches').innerHTML = COLORS.map(c =>
-    `<div class="color-swatch" style="background:${c}" onmousedown="applyColor(event,'${c}',this)" ontouchstart="applyColor(event,'${c}',this)" title="${c}"></div>`
+    `<div class="color-swatch" style="background:${c}" onclick="applyColor('${c}',this)" title="${c}"></div>`
   ).join('');
   document.getElementById('highlight-swatches').innerHTML = HIGHLIGHTS.map(h =>
-    `<div class="highlight-swatch" style="background:${h}" onmousedown="applyHighlight(event,'${h}',this)" ontouchstart="applyHighlight(event,'${h}',this)"></div>`
+    `<div class="highlight-swatch" style="background:${h}" onclick="applyHighlight('${h}',this)"></div>`
   ).join('');
 }
 
-function applyColor(e, color, el) {
-  e.preventDefault();
+function applyColor(color, el) {
   document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
   el.classList.add('active');
   activeTextColor = color;
-  document.getElementById('writing-area').focus();
+  restoreSelection();
   document.execCommand('foreColor', false, color);
+  savedRange = saveSelection();
+  document.getElementById('writing-area').blur();
 }
 
-function applyHighlight(e, color, el) {
-  e.preventDefault();
+function applyHighlight(color, el) {
   document.querySelectorAll('.highlight-swatch').forEach(s => s.classList.remove('active'));
   el.classList.add('active');
   activeHighlight = color;
-  document.getElementById('writing-area').focus();
+  restoreSelection();
   document.execCommand('hiliteColor', false, color);
+  savedRange = saveSelection();
+  document.getElementById('writing-area').blur();
+}
+
+function toggleFormat(type) {
+  restoreSelection();
+  if (type === 'bold') {
+    document.execCommand('bold', false, null);
+    document.getElementById('fmt-bold').classList.toggle('active');
+  }
+  if (type === 'italic') {
+    document.execCommand('italic', false, null);
+    document.getElementById('fmt-italic').classList.toggle('active');
+  }
+  savedRange = saveSelection();
+  document.getElementById('writing-area').blur();
+}
+
+function changeSize(dir) {
+  currentFontSize = Math.max(11, Math.min(22, currentFontSize + dir));
+  const area = document.getElementById('writing-area');
+  const sel = window.getSelection();
+  if (sel && !sel.isCollapsed && area.contains(sel.anchorNode)) {
+    // Apply to selected text only
+    applyStyleToSelection('fontSize', currentFontSize + 'px');
+  } else {
+    // No selection — change whole area default
+    area.style.fontSize = currentFontSize + 'px';
+  }
 }
 
 function insertList() {
   const area = document.getElementById('writing-area');
   area.focus();
-  document.execCommand('insertHTML', false, '<br>• ');
+  document.execCommand('insertText', false, '\n• ');
 }
-
-// Legacy stubs (no longer called but kept for safety)
-function toggleToolbar() {}
-function toggleFormat(type) {}
-function changeSize(dir) {}
-function setTextFont(f, el) {}
-function setDisplayFont(f, el) {}
 </script>
 </body>
 </html>
