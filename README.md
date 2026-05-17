@@ -181,4 +181,4 @@ The night randomizer and question key are browser-only tools — bookmark them r
 
 ---
 
-*built entirely with [Claude](https://claude.ai) · single HTML files · no frameworks*
+*built entirely with [Claude](https://claude.ai) · single HTML files · no frameworks*  
