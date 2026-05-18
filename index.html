@@ -1387,6 +1387,15 @@ function initQuill() {
 
   const tbEl = quill.getModule('toolbar').container;
 
+  // Prevent toolbar taps from stealing focus/clearing selection
+  tbEl.addEventListener('mousedown', e => { e.preventDefault(); });
+  tbEl.addEventListener('touchstart', e => {
+    // Only prevent default on interactive elements, not scrolling
+    if (e.target.closest('button, .ql-picker-label, .ql-picker-item')) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+
   // Undo / Redo / Select-all
   const extraGroup = document.createElement('span');
   extraGroup.className = 'ql-formats';
