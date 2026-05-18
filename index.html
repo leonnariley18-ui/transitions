@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="./icon-192.png">
 <meta name="apple-mobile-web-app-title" content="transitions">
 <meta name="application-name" content="transitions">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Montserrat:wght@300;400;500&family=Poppins:wght@300;400;500&family=Raleway:wght@300;400;500&family=Merriweather:ital,wght@0,300;0,400;1,300;1,400&family=Oswald:wght@300;400;500&family=Roboto+Slab:wght@300;400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Bebas+Neue&family=Chewy&family=Bagel+Fat+One&family=Dancing+Script:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=BioRhyme:wght@300;400;700;800&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600;8..60,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,700&family=Inter:wght@300;400;700&family=Libre+Baskerville:wght@400;700&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,700&family=Karla:wght@300;400;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.snow.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.7/quill.min.js"></script>
 <style>
@@ -33,8 +33,9 @@
   --radius: 16px;
   --radius-sm: 10px;
   --nav-h: 0px;
-  --font-display: 'Playfair Display', Georgia, serif;
-  --font-body: 'Montserrat', sans-serif;
+  --font-display: 'Source Serif 4', Georgia, serif;
+  --font-title: 'BioRhyme', Georgia, serif;
+  --font-body: 'DM Sans', sans-serif;
   --font-write: 'Playfair Display', Georgia, serif;
 }
 
@@ -78,11 +79,9 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
 }
 
 .app-name {
-  font-family: var(--font-display);
-  font-size: 13px; font-style: italic;
-  color: var(--accent); letter-spacing: 0.06em;
-  text-align: center; margin-bottom: 32px;
-  opacity: 0.8;
+  font-family: var(--font-body);
+  font-size: 13px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--accent); text-align: center; margin-bottom: 32px; opacity: 0.7;
 }
 
 .greeting {
@@ -226,8 +225,14 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
 .entry-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 3px; }
 .entry-date { font-size: 11px; color: var(--text-muted); font-weight: 300; white-space: nowrap; flex-shrink: 0; }
 .entry-title { font-family: var(--font-display); font-size: 13px; color: var(--text); font-style: italic; text-align: right; }
-.entry-context-line { font-size: 10px; color: var(--text-muted); font-style: italic; text-align: right; font-weight: 300; }
+.entry-context-line { font-size: 10px; color: var(--text-muted); font-style: italic; text-align: right; font-weight: 300; display: flex; align-items: center; justify-content: flex-end; gap: 5px; flex-wrap: wrap; }
 .entry-context-line strong { color: var(--accent); font-weight: 400; }
+.entry-q-tag {
+  font-size: 9px; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--accent); background: var(--accent-soft);
+  border: 0.5px solid var(--accent-mid); border-radius: 10px;
+  padding: 1px 6px; font-weight: 400; font-style: normal; flex-shrink: 0;
+}
 
 .no-entries { font-size: 12px; color: var(--text-xmuted); text-align: center; padding: 16px 0; font-style: italic; font-family: var(--font-display); }
 
@@ -411,11 +416,36 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
   margin-bottom: 12px; font-weight: 300; line-height: 1.5;
 }
 .entry-context-display strong { color: var(--accent); font-weight: 400; font-style: normal; }
+.context-info-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 0.5px solid var(--accent-mid); color: var(--accent);
+  font-size: 9px; font-style: normal; cursor: pointer;
+  vertical-align: middle; margin-left: 4px;
+  font-family: var(--font-body); line-height: 1;
+  flex-shrink: 0;
+}
+.context-questions-reveal {
+  display: none; margin-top: 8px;
+  padding: 10px 12px; background: var(--accent-soft);
+  border-radius: var(--radius-sm); border: 0.5px solid var(--accent-mid);
+}
+.context-questions-reveal.open { display: block; }
+.context-q-item {
+  font-size: 11px; color: var(--text-soft); line-height: 1.6;
+  font-style: normal; font-weight: 300; margin-bottom: 6px;
+}
+.context-q-item:last-child { margin-bottom: 0; }
+.context-q-label {
+  font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--accent); font-weight: 500; font-style: normal;
+  margin-right: 5px;
+}
 .title-input {
   width: 100%; background: transparent; border: none;
   border-bottom: 0.5px solid var(--border); padding-bottom: 10px; margin-bottom: 0;
-  font-family: var(--font-display); font-size: 20px;
-  color: var(--text); font-style: italic; font-weight: 400;
+  font-family: var(--font-title); font-size: 20px;
+  color: var(--text); font-weight: 500;
   outline: none; transition: border-color 0.2s;
 }
 .title-input::placeholder { color: var(--text-xmuted); }
@@ -558,7 +588,7 @@ body.writing-active .sync-wrap { display: none; }
 }
 .viewer-context { font-size: 11px; color: var(--text-muted); font-style: italic; margin-bottom: 10px; font-weight: 300; }
 .viewer-context strong { color: var(--accent); font-weight: 400; font-style: normal; }
-.viewer-title { font-size: 20px; color: var(--text); font-style: italic; margin-bottom: 12px; border-bottom: 0.5px solid var(--border); padding-bottom: 10px; }
+.viewer-title { font-family: var(--font-title); font-size: 20px; color: var(--text); font-weight: 700; margin-bottom: 12px; border-bottom: 0.5px solid var(--border); padding-bottom: 10px; }
 .viewer-body { font-family: var(--font-display); font-size: 14px; line-height: 1.85; color: var(--text-soft); }
 .viewer-body p { margin-bottom: 0.5em; }
 .viewer-body p:last-child { margin-bottom: 0; }
@@ -627,7 +657,7 @@ body.writing-active .sync-wrap { display: none; }
 
 <!-- PIN screen -->
 <div id="pin-screen" style="display:none; position:fixed; inset:0; background:var(--bg); z-index:999; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; gap:0;">
-  <div style="font-family:var(--font-display); font-size:32px; font-weight:400; color:var(--text); font-style:italic; margin-bottom:8px;">transitions</div>
+  <div style="font-family:var(--font-body); font-size:18px; font-weight:400; letter-spacing:0.12em; text-transform:uppercase; color:var(--text); margin-bottom:8px;">transitions</div>
   <div style="font-size:11px; color:var(--text-muted); letter-spacing:0.14em; text-transform:uppercase; margin-bottom:48px;">enter your pin</div>
   <div style="display:flex; gap:18px; margin-bottom:12px;" id="pin-dots">
     <div class="pdot" id="pdot-0"></div>
@@ -824,10 +854,6 @@ body.writing-active .sync-wrap { display: none; }
         </div>
         <div class="writing-content">
           <div class="entry-context-display" id="writing-context"></div>
-          <div class="title-font-bar">
-            <span class="title-font-label">title</span>
-            <div class="title-font-scroll" id="display-fonts"></div>
-          </div>
           <input class="title-input" id="title-input" placeholder="title your morning…" />
         </div>
         <div class="quill-wrap"><div id="quill-editor"></div></div>
@@ -1016,22 +1042,16 @@ let libraryOpen = false;
 let openInfoId = null;
 
 const TEXT_FONTS = [
-  { label: 'Playfair', value: "'Playfair Display', Georgia, serif" },
-  { label: 'Montserrat', value: "'Montserrat', sans-serif" },
-  { label: 'DM Sans', value: "'DM Sans', sans-serif" },
-  { label: 'Poppins', value: "'Poppins', sans-serif" },
-  { label: 'Raleway', value: "'Raleway', sans-serif" },
-  { label: 'Merriweather', value: "'Merriweather', Georgia, serif" },
-  { label: 'Roboto Slab', value: "'Roboto Slab', serif" },
+  { label: 'Crimson Pro',       value: "'Crimson Pro', Georgia, serif",             quill: 'crimson-pro' },
+  { label: 'Source Serif',      value: "'Source Serif 4', Georgia, serif",          quill: 'source-serif' },
+  { label: 'Libre Baskerville', value: "'Libre Baskerville', Georgia, serif",       quill: 'libre-baskerville' },
+  { label: 'Fraunces',          value: "'Fraunces', Georgia, serif",                quill: 'fraunces' },
+  { label: 'DM Sans',           value: "'DM Sans', sans-serif",                     quill: 'dm-sans' },
+  { label: 'Inter',             value: "'Inter', sans-serif",                       quill: 'inter' },
+  { label: 'Karla',             value: "'Karla', sans-serif",                       quill: 'karla' },
 ];
-const DISPLAY_FONTS = [
-  { label: 'Playfair', value: "'Playfair Display', Georgia, serif" },
-  { label: 'Oswald', value: "'Oswald', sans-serif" },
-  { label: 'Bebas', value: "'Bebas Neue', sans-serif" },
-  { label: 'Chewy', value: "'Chewy', cursive" },
-  { label: 'Bagel Fat', value: "'Bagel Fat One', cursive" },
-  { label: 'Dancing', value: "'Dancing Script', cursive" },
-];
+// Single fixed title font — BioRhyme, not available as body option
+const TITLE_FONT = "'BioRhyme', Georgia, serif";
 const COLORS = ['#2A2D4A','#6A5AC0','#8A4A9A','#2A5A8A','#2A7A5A','#8A5A2A','#7A7A9A','#C0607A'];
 const HIGHLIGHTS = ['#E0E8F8','#E8D8F0','#D8F0E8','#F0E8D8','#F8E8E8','#FDECC8'];
 
@@ -1346,18 +1366,10 @@ function selectQ(id) {
 let quill = null;
 
 const Font = Quill.import('formats/font');
-Font.whitelist = ['playfair','montserrat','dm-sans','poppins','raleway','merriweather','roboto-slab'];
+Font.whitelist = TEXT_FONTS.map(f => f.quill);
 Quill.register(Font, true);
 
-const fontCSSMap = {
-  playfair:     "'Playfair Display', Georgia, serif",
-  montserrat:   "'Montserrat', sans-serif",
-  'dm-sans':    "'DM Sans', sans-serif",
-  poppins:      "'Poppins', sans-serif",
-  raleway:      "'Raleway', sans-serif",
-  merriweather: "'Merriweather', Georgia, serif",
-  'roboto-slab':"'Roboto Slab', serif",
-};
+const fontCSSMap = Object.fromEntries(TEXT_FONTS.map(f => [f.quill, f.value]));
 const _fs = document.createElement('style');
 _fs.textContent = Object.entries(fontCSSMap).map(([k,v]) =>
   `.ql-font-${k}, .ql-font-${k} * { font-family: ${v} !important; }` +
@@ -1449,17 +1461,38 @@ function setTitleFont(idx, el) {
   activeDisplayFont = font;
 }
 
-function buildColorSwatches() {} // handled by Quill
-
-function goToWriting() {
+function buildWritingContext() {
   const q = selectedQuestion ? QUESTIONS.find(q => q.id === selectedQuestion) : null;
   const vibeText = selectedVibe || null;
   const cats = ['protection', q ? q.category : null].filter(Boolean);
-  document.getElementById('writing-context').innerHTML = vibeText
-    ? `arrived <strong>${vibeText}</strong> \u00b7 wrote through ${cats.join(' + ')}`
+  const contextLine = vibeText
+    ? `arrived <strong>${vibeText}</strong> · wrote through ${cats.join(' + ')}`
     : `wrote through ${cats.join(' + ')}`;
+
+  // Build questions list for reveal
+  const questions = [
+    { label: 'anchor', text: ANCHOR.question },
+    ...(q ? [{ label: q.id, text: q.text }] : []),
+  ];
+  const questionsHTML = questions.map(item =>
+    `<div class="context-q-item"><span class="context-q-label">${item.label}</span>${item.text}</div>`
+  ).join('');
+
+  document.getElementById('writing-context').innerHTML = `
+    <span>${contextLine}</span>
+    <span class="context-info-btn" onclick="toggleContextReveal(this)">i</span>
+    <div class="context-questions-reveal">${questionsHTML}</div>`;
+}
+
+function toggleContextReveal(btn) {
+  const reveal = btn.nextElementSibling;
+  reveal.classList.toggle('open');
+}
+
+function goToWriting() {
+  buildWritingContext();
   document.getElementById('title-input').value = '';
-  resetTitleFont();
+  document.getElementById('title-input').style.fontFamily = TITLE_FONT;
   document.getElementById('writing-date-label').textContent =
     new Date().toLocaleDateString('en-US', { weekday:'short', month:'long', day:'numeric' }).toLowerCase();
   document.body.classList.add('writing-active');
@@ -1480,13 +1513,13 @@ function saveEntry() {
     date: fmt(new Date()),
     dateDisplay: new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }),
     title: title || null,
-    titleFont: document.getElementById('title-input').style.fontFamily || activeDisplayFont,
-    editorFont: document.querySelector('.ql-editor')?.style.fontFamily || '',
     body: bodyText, bodyHTML: quill.root.innerHTML,
     bodyDelta: JSON.stringify(quill.getContents()),
     vibe: selectedVibe,
     cats: ['protection', q ? q.category : null].filter(Boolean),
-    anchorQ: ANCHOR.question, secondQ: q ? q.text : null,
+    anchorQ: ANCHOR.question,
+    secondQ: q ? q.text : null,
+    secondQId: q ? q.id : null,
   };
   appData.entries.unshift(entry); save(); clearDraft();
   document.getElementById('home-count').textContent =
@@ -1505,12 +1538,16 @@ function saveDraft() {
   const title = document.getElementById('title-input').value.trim();
   const q = selectedQuestion ? QUESTIONS.find(q => q.id === selectedQuestion) : null;
   localStorage.setItem('transitions_draft', JSON.stringify({
-    title, titleFont: activeDisplayFont,
+    title,
     body: quill ? quill.getText().trim() : '',
     bodyHTML: quill ? quill.root.innerHTML : '',
     bodyDelta: quill ? JSON.stringify(quill.getContents()) : '',
-    vibe: selectedVibe, cats: ['protection', q ? q.category : null].filter(Boolean),
-    selectedQuestion, anchorQ: ANCHOR.question, secondQ: q ? q.text : null,
+    vibe: selectedVibe,
+    cats: ['protection', q ? q.category : null].filter(Boolean),
+    selectedQuestion,
+    anchorQ: ANCHOR.question,
+    secondQ: q ? q.text : null,
+    secondQId: q ? q.id : null,
     savedAt: new Date().toISOString(),
   }));
   document.body.classList.remove('writing-active');
@@ -1521,24 +1558,13 @@ function resumeDraft() {
   const raw = localStorage.getItem('transitions_draft');
   if (!raw) return;
   const draft = JSON.parse(raw);
-  selectedVibe = draft.vibe || null; selectedQuestion = draft.selectedQuestion || null;
-  const cats = draft.cats || ['protection'];
-  document.getElementById('writing-context').innerHTML = draft.vibe
-    ? `arrived <strong>${draft.vibe}</strong> \u00b7 wrote through ${cats.join(' + ')}`
-    : `wrote through ${cats.join(' + ')}`;
+  selectedVibe = draft.vibe || null;
+  selectedQuestion = draft.selectedQuestion || null;
   document.getElementById('title-input').value = draft.title || '';
-  if (draft.titleFont) {
-    activeDisplayFont = draft.titleFont;
-    document.getElementById('title-input').style.fontFamily = draft.titleFont;
-    document.querySelectorAll('.title-font-pill').forEach(p => {
-      const idx = parseInt(p.dataset.idx || 0);
-      p.classList.toggle('active', DISPLAY_FONTS[idx]?.value === draft.titleFont);
-    });
-  } else {
-    resetTitleFont();
-  }
+  document.getElementById('title-input').style.fontFamily = TITLE_FONT;
   document.getElementById('writing-date-label').textContent =
     new Date().toLocaleDateString('en-US', { weekday:'short', month:'long', day:'numeric' }).toLowerCase();
+  buildWritingContext();
   document.body.classList.add('writing-active');
   showPage('page-writing'); initQuill();
   try {
@@ -1577,25 +1603,38 @@ function renderEntries() {
   let entries = [...appData.entries];
   if (activeVibeFilters.length) entries = entries.filter(e => activeVibeFilters.includes(e.vibe));
   if (activeCatFilters.length) entries = entries.filter(e => e.cats && e.cats.some(c => activeCatFilters.includes(c)));
-  if (query) entries = entries.filter(e =>
-    (e.title || '').toLowerCase().includes(query) ||
-    (e.body || '').toLowerCase().includes(query) ||
-    (e.date || '').toLowerCase().includes(query) ||
-    (e.vibe || '').toLowerCase().includes(query) ||
-    (e.cats || []).some(c => c.toLowerCase().includes(query))
-  );
+  if (query) {
+    const MONTHS = { jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11,
+      january:0,february:1,march:2,april:3,june:5,july:6,august:7,september:8,october:9,november:10,december:11 };
+    const monthNum = MONTHS[query.toLowerCase().replace('.','')];
+    entries = entries.filter(e => {
+      if (monthNum !== undefined) {
+        // match by month — dateDisplay is "May 17, 2026" or date is "2026-05-17"
+        const d = new Date(e.date || e.dateDisplay);
+        return !isNaN(d) && d.getMonth() === monthNum;
+      }
+      return (e.title || '').toLowerCase().includes(query) ||
+        (e.body || '').toLowerCase().includes(query) ||
+        (e.date || '').toLowerCase().includes(query) ||
+        (e.dateDisplay || '').toLowerCase().includes(query) ||
+        (e.vibe || '').toLowerCase().includes(query) ||
+        (e.cats || []).some(c => c.toLowerCase().includes(query)) ||
+        (e.secondQId || '').toLowerCase().includes(query);
+    });
+  }
   const el = document.getElementById('entries-list');
   if (!entries.length) { el.innerHTML = '<div class="no-entries">no entries found</div>'; return; }
   el.innerHTML = entries.map(e => {
     const catsStr = e.cats ? e.cats.join(' + ') : 'protection';
     const vibeStr = e.vibe ? `arrived <strong>${e.vibe}</strong> \u00b7 ` : '';
     const titleDisplay = e.title || 'untitled';
+    const qTag = e.secondQId ? `<span class="entry-q-tag">${e.secondQId}</span>` : '';
     return `<div class="entry-row" onclick="viewEntry(${e.id})">
       <div class="entry-top">
         <span class="entry-date">${e.dateDisplay || e.date}</span>
         <span class="entry-title">${titleDisplay}</span>
       </div>
-      <div class="entry-context-line">${vibeStr}wrote through ${catsStr}</div>
+      <div class="entry-context-line">${vibeStr}wrote through ${catsStr}${qTag}</div>
     </div>`;
   }).join('');
 }
@@ -1606,13 +1645,23 @@ function viewEntry(id) {
   const wrap = document.getElementById('entry-viewer-wrap');
   const catsStr = entry.cats ? entry.cats.join(' + ') : 'protection';
   const vibeStr = entry.vibe ? `arrived <strong>${entry.vibe}</strong> \u00b7 ` : '';
-  const titleStyle = entry.titleFont ? `font-family:${entry.titleFont}` : '';
-  const bodyStyle  = entry.editorFont ? `font-family:${entry.editorFont}` : '';
+
+  // Build questions reveal
+  const questions = [{ label: 'anchor', text: entry.anchorQ || ANCHOR.question }];
+  if (entry.secondQ) questions.push({ label: entry.secondQId || 'q', text: entry.secondQ });
+  const questionsHTML = questions.map(item =>
+    `<div class="context-q-item"><span class="context-q-label">${item.label}</span>${item.text}</div>`
+  ).join('');
+
   wrap.style.display = 'block';
   wrap.innerHTML = `<div class="entry-viewer">
-    <div class="viewer-context">${vibeStr}wrote through ${catsStr}</div>
-    ${entry.title ? `<div class="viewer-title" style="${titleStyle}">${entry.title}</div>` : ''}
-    <div class="viewer-body" style="${bodyStyle}">${entry.bodyHTML || '<p>' + entry.body + '</p>'}</div>
+    <div class="viewer-context">
+      <span>${vibeStr}wrote through ${catsStr}</span>
+      <span class="context-info-btn" onclick="this.nextElementSibling.classList.toggle('open')">i</span>
+      <div class="context-questions-reveal">${questionsHTML}</div>
+    </div>
+    ${entry.title ? `<div class="viewer-title" style="font-family:${TITLE_FONT}">${entry.title}</div>` : ''}
+    <div class="viewer-body">${entry.bodyHTML || '<p>' + entry.body + '</p>'}</div>
     <button class="viewer-close" onclick="closeViewer()">close</button>
   </div>`;
   wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1638,10 +1687,13 @@ function exportEntries() {
   showToast('exported \u2728');
 }
 
+function buildFontPills() {}
+function buildColorSwatches() {}
 function insertList() { if (quill) quill.format('list','bullet'); }
 function switchTab() {} function doFmt() {} function toggleToolbar() {}
 function saveSelectionNow() {} function toggleFormat() {} function changeSize() {}
-function setTextFont() {} function setDisplayFont() {}
+function setTextFont() {} function setDisplayFont() {} function resetTitleFont() {}
+function setTitleFont() {}
 </script>
 </body>
 </html>
