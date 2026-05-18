@@ -938,22 +938,19 @@ function pinToToken(pin) {
 }
 
 async function loadFromSupabase() {
-  try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?user_token=eq.${USER_TOKEN}&select=*`, {
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-    });
-    const rows = await res.json();
-    if (rows && rows.length > 0) return { entries: rows[0].entries || [] };
-    await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
-      method: 'POST',
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-      body: JSON.stringify({ user_token: USER_TOKEN, entries: [] })
-    });
-    return { entries: [] };
-  } catch(e) {
-    console.warn('Supabase load failed, using localStorage:', e);
-    return JSON.parse(localStorage.getItem('transitions_v1') || '{"entries":[]}');
-  }
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?user_token=eq.${USER_TOKEN}&select=*`, {
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+  });
+  if (!res.ok) throw new Error(`Supabase error ${res.status}`);
+  const rows = await res.json();
+  if (rows && rows.length > 0) return { entries: rows[0].entries || [] };
+  // No row yet — create one
+  await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
+    method: 'POST',
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+    body: JSON.stringify({ user_token: USER_TOKEN, entries: [] })
+  });
+  return { entries: [] };
 }
 
 async function saveToSupabase(data) {
@@ -961,9 +958,18 @@ async function saveToSupabase(data) {
   try {
     const patchRes = await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}?user_token=eq.${USER_TOKEN}`, {
       method: 'PATCH',
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
       body: JSON.stringify({ entries: data.entries, updated_at: new Date().toISOString() })
     });
+    const patched = await patchRes.json();
+    if (!patched || patched.length === 0) {
+      // Row doesn't exist yet — insert it
+      await fetch(`${SUPABASE_URL}/rest/v1/${TABLE}`, {
+        method: 'POST',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ user_token: USER_TOKEN, entries: data.entries })
+      });
+    }
     localStorage.setItem('transitions_v1', JSON.stringify(data));
     setSyncDot('');
   } catch(e) {
@@ -1052,11 +1058,13 @@ const TEXT_FONTS = [
 ];
 // Single fixed title font — BioRhyme, not available as body option
 const TITLE_FONT = "'BioRhyme', Georgia, serif";
+const DISPLAY_FONTS = []; // title font is fixed (BioRhyme), no picker needed
+
+let activeDisplayFont = TITLE_FONT;
 const COLORS = ['#2A2D4A','#6A5AC0','#8A4A9A','#2A5A8A','#2A7A5A','#8A5A2A','#7A7A9A','#C0607A'];
 const HIGHLIGHTS = ['#E0E8F8','#E8D8F0','#D8F0E8','#F0E8D8','#F8E8E8','#FDECC8'];
 
 let activeTextFont = TEXT_FONTS[0].value;
-let activeDisplayFont = DISPLAY_FONTS[0].value;
 
 function save() {
   localStorage.setItem('transitions_v1', JSON.stringify(appData));
@@ -1120,11 +1128,15 @@ async function handlePin() {
 }
 
 async function launchApp() {
+  document.getElementById('home-count').textContent = 'loading…';
   setSyncDot('syncing');
   try {
     appData = await loadFromSupabase();
+    localStorage.setItem('transitions_v1', JSON.stringify(appData));
     setSyncDot('');
   } catch(e) {
+    console.warn('Supabase unreachable, falling back to local cache:', e);
+    try { appData = JSON.parse(localStorage.getItem('transitions_v1') || '{"entries":[]}'); } catch(_) {}
     setSyncDot('error');
   }
   initUI();
@@ -1435,31 +1447,15 @@ function initQuill() {
   extraGroup.querySelector('.ql-selectall').addEventListener('click', () => quill.setSelection(0, quill.getLength()));
 }
 
-function buildFontPills() {
-  // Title (display) font pills
-  const displayEl = document.getElementById('display-fonts');
-  if (displayEl) {
-    displayEl.innerHTML = DISPLAY_FONTS.map((f, i) =>
-      `<span class="title-font-pill${i===0?' active':''}" data-idx="${i}" style="font-family:${f.value}" onclick="setTitleFont('${i}',this)">${f.label}</span>`
-    ).join('');
-  }
-}
+function buildFontPills() {} // title font is fixed, no picker
 
 function resetTitleFont() {
-  activeDisplayFont = DISPLAY_FONTS[0].value;
-  document.getElementById('title-input').style.fontFamily = activeDisplayFont;
-  document.querySelectorAll('.title-font-pill').forEach((p, i) => {
-    p.classList.toggle('active', i === 0);
-  });
+  activeDisplayFont = TITLE_FONT;
+  const el = document.getElementById('title-input');
+  if (el) el.style.fontFamily = TITLE_FONT;
 }
 
-function setTitleFont(idx, el) {
-  const font = DISPLAY_FONTS[parseInt(idx)].value;
-  document.querySelectorAll('.title-font-pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('title-input').style.fontFamily = font;
-  activeDisplayFont = font;
-}
+function setTitleFont() {} // no-op
 
 function buildWritingContext() {
   const q = selectedQuestion ? QUESTIONS.find(q => q.id === selectedQuestion) : null;
