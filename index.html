@@ -1387,14 +1387,24 @@ function initQuill() {
 
   const tbEl = quill.getModule('toolbar').container;
 
-  // Prevent toolbar taps from stealing focus/clearing selection
+  // Prevent toolbar mousedown from stealing focus (preserves selection on desktop).
   tbEl.addEventListener('mousedown', e => { e.preventDefault(); });
-  tbEl.addEventListener('touchstart', e => {
-    // Only prevent default on interactive elements, not scrolling
-    if (e.target.closest('button, .ql-picker-label, .ql-picker-item')) {
-      e.preventDefault();
-    }
-  }, { passive: false });
+
+  // On mobile, save selection before toolbar tap and restore it if Quill lost it.
+  let _savedRange = null;
+  quill.on('selection-change', range => {
+    if (range) _savedRange = range;
+  });
+  tbEl.addEventListener('touchstart', () => {
+    _savedRange = quill.getSelection() || _savedRange;
+  }, { passive: true });
+  tbEl.addEventListener('touchend', () => {
+    requestAnimationFrame(() => {
+      if (!quill.getSelection() && _savedRange) {
+        quill.setSelection(_savedRange.index, _savedRange.length, 'silent');
+      }
+    });
+  }, { passive: true });
 
   // Undo / Redo / Select-all
   const extraGroup = document.createElement('span');
