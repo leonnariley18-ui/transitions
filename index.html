@@ -426,19 +426,19 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
   border: none; border-bottom: 0.5px solid var(--border);
   background: var(--bg2);
   padding: 4px 8px;
-  display: flex; flex-wrap: nowrap; overflow-x: auto;
-  scrollbar-width: none; gap: 0;
-  -webkit-overflow-scrolling: touch;
+  display: flex; flex-wrap: wrap;
+  gap: 0;
+  position: relative; z-index: 20;
+  /* overflow must be visible so dropdowns aren't clipped */
+  overflow: visible;
 }
-.ql-toolbar.ql-snow::-webkit-scrollbar { display: none; }
-.ql-toolbar.ql-snow .ql-formats { margin-right: 6px; flex-shrink: 0; }
+.ql-toolbar.ql-snow .ql-formats { margin-right: 6px; margin-bottom: 2px; flex-shrink: 0; }
 .ql-container.ql-snow {
   border: none; flex: 1;
   font-family: var(--font-display); font-size: 15px; color: var(--text); background: var(--bg);
 }
 .ql-editor { padding: 18px 22px 120px; line-height: 1.85; color: var(--text); font-family: inherit; font-weight: 300; }
 .ql-editor.ql-blank::before { color: var(--text-xmuted); font-style: italic; font-family: var(--font-display); left: 22px; right: 22px; }
-/* Keep keyboard up - don't interfere with selection */
 .ql-editor { -webkit-user-select: text !important; user-select: text !important; }
 .ql-snow .ql-stroke { stroke: var(--text-muted); stroke-width: 1.5px; }
 .ql-snow .ql-fill, .ql-snow .ql-stroke.ql-fill { fill: var(--text-muted); }
@@ -451,21 +451,25 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
 .ql-snow.ql-toolbar button.ql-active .ql-stroke { stroke: var(--accent); }
 .ql-snow.ql-toolbar button:hover .ql-fill,
 .ql-snow.ql-toolbar button.ql-active .ql-fill { fill: var(--accent); }
+/* Dropdowns — appear above everything */
 .ql-snow .ql-picker-options {
+  z-index: 9999 !important;
   background: var(--card); border: 0.5px solid var(--border) !important;
-  border-radius: var(--radius-sm); box-shadow: 0 4px 20px rgba(42,45,74,0.10); padding: 4px;
+  border-radius: var(--radius-sm); box-shadow: 0 4px 20px rgba(42,45,74,0.12); padding: 4px;
+}
+/* Font picker — scrollable vertical list */
+.ql-snow .ql-font .ql-picker-options {
+  max-height: 200px; overflow-y: auto;
+  width: 140px;
 }
 .ql-snow .ql-picker-item { border-radius: 4px; padding: 4px 8px; }
 .ql-snow .ql-picker-item:hover { background: var(--accent-soft); color: var(--accent); }
 .ql-snow .ql-picker-label:hover,
 .ql-snow .ql-picker.ql-expanded .ql-picker-label { color: var(--accent); border-color: var(--accent-mid) !important; }
 .ql-snow .ql-picker.ql-expanded .ql-picker-label .ql-stroke { stroke: var(--accent); }
-/* Color picker — prevent overflow */
-.ql-snow .ql-color-picker.ql-color .ql-picker-options,
-.ql-snow .ql-color-picker.ql-background .ql-picker-options {
-  padding: 5px; width: 162px; right: 0; left: auto;
-}
-.ql-snow .ql-color-picker .ql-picker-item { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid transparent; margin: 2px; }
+/* Color/background pickers */
+.ql-snow .ql-color-picker .ql-picker-options { padding: 6px; width: 168px; }
+.ql-snow .ql-color-picker .ql-picker-item { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid transparent; margin: 2px; }
 .ql-snow .ql-color-picker .ql-picker-item:hover,
 .ql-snow .ql-color-picker .ql-picker-item.ql-selected { border-color: var(--accent); transform: scale(1.15); }
 /* Title font bar */
@@ -490,19 +494,32 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
 }
 .title-font-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-.sync-dot {
-  position: fixed; top: 14px; right: 16px;
-  width: 7px; height: 7px; border-radius: 50%;
-  background: #5A9A6A; opacity: 0.7; z-index: 50;
-  transition: background 0.3s;
+.sync-wrap {
+  position: fixed; top: 10px; right: 14px;
+  z-index: 200; display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
 }
+body.writing-active .sync-wrap { display: none; }
+.sync-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #5A9A6A; opacity: 0.7;
+  cursor: pointer; transition: background 0.3s, transform 0.15s;
+}
+.sync-dot:active { transform: scale(1.5); opacity: 1; }
 .sync-dot.syncing { background: #C4A02A; animation: sdpulse 1s ease infinite; opacity: 0.8; }
 .sync-dot.error { background: #C46060; opacity: 1; }
 @keyframes sdpulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
-/* Hide sync dot on writing page */
-#page-writing.active ~ * .sync-dot,
-.page.active#page-writing + * #sync-dot { display: none; }
-body.writing-active .sync-dot { display: none; }
+.sync-menu {
+  display: none; flex-direction: column; gap: 4px; align-items: flex-end;
+}
+.sync-menu.open { display: flex; animation: fadeIn 0.15s ease; }
+.sync-menu-btn {
+  font-size: 10px; letter-spacing: 0.04em;
+  color: var(--text-soft); background: var(--card);
+  border: 0.5px solid var(--border); border-radius: 20px;
+  padding: 5px 11px; cursor: pointer;
+  font-family: var(--font-body); font-weight: 300;
+  white-space: nowrap; box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+}
 
 .pdot {
   width: 13px; height: 13px; border-radius: 50%;
@@ -600,7 +617,13 @@ body.writing-active .sync-dot { display: none; }
 <body>
 
 <!-- Sync dot -->
-<div class="sync-dot" id="sync-dot"></div>
+<div class="sync-wrap" id="sync-wrap">
+  <div class="sync-dot" id="sync-dot" onclick="toggleSyncMenu()"></div>
+  <div class="sync-menu" id="sync-menu">
+    <div class="sync-menu-btn" onclick="forceSync()">sync</div>
+    <div class="sync-menu-btn" onclick="window.location.reload()">reload</div>
+  </div>
+</div>
 
 <!-- PIN screen -->
 <div id="pin-screen" style="display:none; position:fixed; inset:0; background:var(--bg); z-index:999; flex-direction:column; align-items:center; justify-content:center; padding:40px 20px; gap:0;">
@@ -709,6 +732,14 @@ body.writing-active .sync-dot { display: none; }
             <div id="entries-list"></div>
 
             <button class="export-btn" onclick="exportEntries()">↓ export entries</button>
+            <button class="export-btn" id="clear-data-btn" onclick="confirmClearData()" style="color:#C46060;border-color:#C06060;margin-top:6px">⚠ clear all data</button>
+            <div id="clear-data-confirm" style="display:none;margin-top:8px;padding:10px 12px;background:#FDF0F0;border-radius:var(--radius-sm);border:0.5px solid #E0A0A0;font-size:12px;color:#8A3030;font-family:var(--font-body);font-weight:300;">
+              this will delete all entries permanently.
+              <div style="display:flex;gap:14px;margin-top:8px;">
+                <span onclick="doClearData()" style="cursor:pointer;color:#C46060;font-weight:500">yes, delete everything</span>
+                <span onclick="cancelClearData()" style="cursor:pointer;color:var(--text-muted)">cancel</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -920,6 +951,57 @@ function setSyncDot(state) {
   const dot = document.getElementById('sync-dot');
   if (!dot) return;
   dot.className = 'sync-dot' + (state ? ' ' + state : '');
+}
+
+let syncMenuOpen = false;
+function toggleSyncMenu() {
+  syncMenuOpen = !syncMenuOpen;
+  document.getElementById('sync-menu').classList.toggle('open', syncMenuOpen);
+  if (syncMenuOpen) {
+    setTimeout(() => document.addEventListener('click', closeSyncOutside, { once: true }), 10);
+  }
+}
+function closeSyncOutside(e) {
+  if (!document.getElementById('sync-wrap').contains(e.target)) {
+    syncMenuOpen = false;
+    document.getElementById('sync-menu').classList.remove('open');
+  }
+}
+async function forceSync() {
+  syncMenuOpen = false;
+  document.getElementById('sync-menu').classList.remove('open');
+  if (!USER_TOKEN) { showToast('not signed in'); return; }
+  setSyncDot('syncing');
+  try {
+    await saveToSupabase(appData);
+    appData = await loadFromSupabase();
+    setSyncDot('');
+    renderEntries();
+    showToast('synced ✓');
+  } catch(e) {
+    setSyncDot('error');
+    showToast('sync failed');
+  }
+}
+
+function confirmClearData() {
+  document.getElementById('clear-data-btn').style.display = 'none';
+  document.getElementById('clear-data-confirm').style.display = 'block';
+}
+function cancelClearData() {
+  document.getElementById('clear-data-confirm').style.display = 'none';
+  document.getElementById('clear-data-btn').style.display = '';
+}
+async function doClearData() {
+  appData = { entries: [] };
+  localStorage.removeItem('transitions_v1');
+  localStorage.removeItem('transitions_draft');
+  await saveToSupabase(appData);
+  document.getElementById('home-count').textContent = 'no entries yet — begin below';
+  document.getElementById('lib-count').textContent = 0;
+  renderEntries(); checkDraft();
+  cancelClearData();
+  showToast('all data cleared');
 }
 
 let appData = { entries: [] };
@@ -1305,58 +1387,7 @@ function initQuill() {
 
   const tbEl = quill.getModule('toolbar').container;
 
-  // ── Teleport dropdowns to <body> so overflow:auto can't clip them ──────
-  // Quill keeps picker-options inside the toolbar; we move them to body
-  // whenever a picker opens, position them under their label, and move
-  // them back when they close (so Quill's internal state stays intact).
-  function teleportOpen(picker) {
-    const options = picker.querySelector('.ql-picker-options');
-    const label   = picker.querySelector('.ql-picker-label');
-    if (!options || !label || options._teleported) return;
-
-    const r = label.getBoundingClientRect();
-    // Style before moving so dimensions are available
-    options.style.position = 'fixed';
-    options.style.zIndex   = '99999';
-    options.style.top      = (r.bottom + 4) + 'px';
-
-    document.body.appendChild(options);
-    options._teleported  = true;
-    options._origParent  = picker;
-
-    // Horizontal: align to label, clamp inside viewport
-    const w   = options.offsetWidth || 160;
-    let left  = r.left;
-    if (left + w > window.innerWidth - 8) left = window.innerWidth - w - 8;
-    options.style.left = left + 'px';
-  }
-
-  function teleportClose(picker) {
-    const options = picker.querySelector('.ql-picker-options') ||
-                    [...document.body.querySelectorAll('.ql-picker-options')]
-                      .find(o => o._origParent === picker);
-    if (!options || !options._teleported) return;
-    picker.appendChild(options);
-    options.style.position = '';
-    options.style.zIndex   = '';
-    options.style.top      = '';
-    options.style.left     = '';
-    options._teleported    = false;
-  }
-
-  // Watch picker open/close via MutationObserver on the toolbar
-  const mo = new MutationObserver(() => {
-    tbEl.querySelectorAll('.ql-picker').forEach(picker => {
-      if (picker.classList.contains('ql-expanded')) {
-        teleportOpen(picker);
-      } else {
-        teleportClose(picker);
-      }
-    });
-  });
-  mo.observe(tbEl, { attributes: true, subtree: true, attributeFilter: ['class'] });
-
-  // ── Undo / Redo / Select-all ────────────────────────────────────────────
+  // Undo / Redo / Select-all
   const extraGroup = document.createElement('span');
   extraGroup.className = 'ql-formats';
   extraGroup.innerHTML = `
@@ -1366,13 +1397,11 @@ function initQuill() {
     <button class="ql-redo" title="Redo">
       <svg viewBox="0 0 18 18"><polygon class="ql-fill ql-stroke" points="12 10 14 12 16 10 12 10"></polygon><path class="ql-stroke" d="M9.91,13.91A4.6,4.6,0,0,1,9,14,5,5,0,1,1,14,9"></path></svg>
     </button>
-    <button class="ql-selectall" title="Select all" style="width:auto;padding:3px 7px;font-size:10px;font-family:var(--font-body);letter-spacing:0.04em">all</button>`;
+    <button class="ql-selectall" title="Select all" style="width:auto;padding:3px 7px;font-size:10px;font-family:var(--font-body);letter-spacing:0.04em;color:var(--text-muted)">all</button>`;
   tbEl.appendChild(extraGroup);
   extraGroup.querySelector('.ql-undo').addEventListener('click', () => quill.history.undo());
   extraGroup.querySelector('.ql-redo').addEventListener('click', () => quill.history.redo());
-  extraGroup.querySelector('.ql-selectall').addEventListener('click', () => {
-    quill.setSelection(0, quill.getLength());
-  });
+  extraGroup.querySelector('.ql-selectall').addEventListener('click', () => quill.setSelection(0, quill.getLength()));
 }
 
 function buildFontPills() {
