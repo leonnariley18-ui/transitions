@@ -336,7 +336,9 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
   border: 0.5px solid var(--accent-mid);
   padding: 16px 18px; margin-bottom: 20px;
   animation: slideUp 0.3s ease 0.05s both;
+  transition: opacity 0.15s, transform 0.1s;
 }
+.q-anchor-display:active { opacity: 0.85; transform: scale(0.99); }
 .q-eyebrow { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 7px; font-weight: 500; }
 .q-anchor-text { font-family: var(--font-display); font-size: 14px; line-height: 1.65; color: var(--text); font-weight: 400; }
 
@@ -624,6 +626,13 @@ body.writing-active .sync-wrap { display: none; }
 .writing-btn-row {
   display: flex; gap: 8px; align-items: center;
 }
+.autosaved-label {
+  font-size: 10px; color: var(--accent); font-family: var(--font-body);
+  font-weight: 300; letter-spacing: 0.04em;
+  opacity: 0; transition: opacity 0.4s ease;
+  pointer-events: none; white-space: nowrap;
+}
+.autosaved-label.show { opacity: 1; }
 .draft-btn {
   font-size: 11px; color: var(--text-muted);
   font-weight: 300; letter-spacing: 0.04em;
@@ -764,6 +773,7 @@ body.writing-active .sync-wrap { display: none; }
             <div id="entries-list"></div>
 
             <button class="export-btn" onclick="exportEntries()">↓ export entries</button>
+
           </div>
         </div>
 
@@ -819,9 +829,10 @@ body.writing-active .sync-wrap { display: none; }
           <span class="back-label">back</span>
         </div>
 
-        <div class="q-anchor-display">
-          <div class="q-eyebrow">anchor</div>
+        <div class="q-anchor-display" onclick="goToWriting()" style="cursor:pointer">
+          <div class="q-eyebrow">anchor — tap to begin writing</div>
           <div class="q-anchor-text" id="q-anchor-display-text"></div>
+          <div style="text-align:right;margin-top:8px;font-size:11px;color:var(--accent);font-family:var(--font-body);font-weight:400;letter-spacing:0.04em;">let's write →</div>
         </div>
 
         <div id="vibe-tag-area"></div>
@@ -829,8 +840,6 @@ body.writing-active .sync-wrap { display: none; }
 
         <div id="surfaced-section"></div>
         <div id="rest-section"></div>
-
-        <button class="btn-primary" onclick="goToWriting()" style="margin-top:16px">let's write →</button>
       </div>
     </div>
 
@@ -841,6 +850,7 @@ body.writing-active .sync-wrap { display: none; }
           <div class="writing-save-row">
             <div class="writing-date-label" id="writing-date-label">—</div>
             <div class="writing-btn-row">
+              <span class="autosaved-label" id="autosaved-label">autosaved</span>
               <button class="draft-btn" onclick="saveDraft()">save draft</button>
               <button class="save-btn-inline" onclick="saveEntry()">save</button>
             </div>
@@ -1239,7 +1249,10 @@ function showPage(id) {
   page.querySelector('.screen-inner')?.scrollTo(0,0);
   const screen = document.querySelector('.screen');
   screen.scrollTo(0,0);
-  if (id !== 'page-writing') document.body.classList.remove('writing-active');
+  if (id !== 'page-writing') {
+    document.body.classList.remove('writing-active');
+    stopAutosave();
+  }
 }
 
 function goBack(targetPage) { showPage(targetPage); }
@@ -1471,6 +1484,7 @@ function goToWriting() {
   showPage('page-writing');
   initQuill();
   quill.setContents([]); quill.enable();
+  startAutosave();
   setTimeout(() => quill.focus(), 300);
 }
 
@@ -1502,6 +1516,7 @@ function saveEntry() {
   document.querySelectorAll('.vibe-btn, .vibe-single').forEach(b => b.classList.remove('selected'));
   const btn = document.getElementById('vibe-next-btn');
   btn.style.opacity = '0.4'; btn.style.pointerEvents = 'none';
+  stopAutosave();
   document.body.classList.remove('writing-active');
   showPage('page-home'); showToast('entry saved \u2728');
 }
@@ -1522,6 +1537,7 @@ function saveDraft() {
     secondQId: q ? q.id : null,
     savedAt: new Date().toISOString(),
   }));
+  stopAutosave();
   document.body.classList.remove('writing-active');
   showPage('page-home'); checkDraft(); showToast('draft saved \uD83C\uDF19');
 }
@@ -1544,6 +1560,7 @@ function resumeDraft() {
     else if (draft.bodyHTML) quill.root.innerHTML = draft.bodyHTML;
     else quill.setContents([]);
   } catch(e) { quill.setContents([]); }
+  startAutosave();
   setTimeout(() => quill.focus(), 300);
 }
 
@@ -1659,13 +1676,60 @@ function exportEntries() {
   showToast('exported \u2728');
 }
 
-function buildFontPills() {}
-function buildColorSwatches() {}
 function insertList() { if (quill) quill.format('list','bullet'); }
 function switchTab() {} function doFmt() {} function toggleToolbar() {}
 function saveSelectionNow() {} function toggleFormat() {} function changeSize() {}
-function setTextFont() {} function setDisplayFont() {} function resetTitleFont() {}
-function setTitleFont() {}
+function setTextFont() {} function setDisplayFont() {}
+
+// ── AUTOSAVE ──────────────────────────────────────────────────────────────
+let _autosaveTimer = null;
+
+function startAutosave() {
+  stopAutosave();
+  _autosaveTimer = setInterval(autosaveTick, 45000);
+  document.addEventListener('visibilitychange', onVisibilityChange);
+}
+
+function stopAutosave() {
+  if (_autosaveTimer) { clearInterval(_autosaveTimer); _autosaveTimer = null; }
+  document.removeEventListener('visibilitychange', onVisibilityChange);
+}
+
+function onVisibilityChange() {
+  if (document.hidden && document.body.classList.contains('writing-active')) {
+    autosaveTick();
+  }
+}
+
+function autosaveTick() {
+  if (!quill) return;
+  const bodyText = quill.getText().trim();
+  if (!bodyText) return;
+  const title = document.getElementById('title-input')?.value.trim() || '';
+  const q = selectedQuestion ? QUESTIONS.find(q => q.id === selectedQuestion) : null;
+  localStorage.setItem('transitions_draft', JSON.stringify({
+    title,
+    body: bodyText,
+    bodyHTML: quill.root.innerHTML,
+    bodyDelta: JSON.stringify(quill.getContents()),
+    vibe: selectedVibe,
+    cats: ['protection', q ? q.category : null].filter(Boolean),
+    selectedQuestion,
+    anchorQ: ANCHOR.question,
+    secondQ: q ? q.text : null,
+    secondQId: q ? q.id : null,
+    savedAt: new Date().toISOString(),
+    autosaved: true,
+  }));
+  showAutosavedLabel();
+}
+
+function showAutosavedLabel() {
+  const el = document.getElementById('autosaved-label');
+  if (!el) return;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 1500);
+}
 </script>
 </body>
 </html>
