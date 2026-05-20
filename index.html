@@ -589,11 +589,9 @@ body.writing-active .sync-wrap { display: none; }
 .viewer-context { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; font-weight: 300; }
 .viewer-context strong { color: var(--accent); font-weight: 400; font-style: normal; }
 .viewer-title { font-family: var(--font-title); font-size: 20px; color: var(--text); font-weight: 700; margin-bottom: 12px; border-bottom: 0.5px solid var(--border); padding-bottom: 10px; }
-.viewer-body p { margin-bottom: 0.5em; }
-.viewer-body p:last-child { margin-bottom: 0; }
 .ql-size-small, .viewer-body .ql-size-small { font-size: 0.75em; }
 .ql-size-large, .viewer-body .ql-size-large { font-size: 1.5em; }
-.ql-size-huge,  .viewer-body .ql-size-huge  { font-size: 2em; }
+.ql-size-huge, .viewer-body .ql-size-huge { font-size: 2em; }
 .viewer-body { font-family: var(--font-display); font-size: 14px; line-height: 1.85; color: var(--text-soft); }
 .viewer-body p { margin-bottom: 0.5em; }
 .viewer-body p:last-child { margin-bottom: 0; }
@@ -766,14 +764,6 @@ body.writing-active .sync-wrap { display: none; }
             <div id="entries-list"></div>
 
             <button class="export-btn" onclick="exportEntries()">↓ export entries</button>
-            <button class="export-btn" id="clear-data-btn" onclick="confirmClearData()" style="color:#C46060;border-color:#C06060;margin-top:6px">⚠ clear all data</button>
-            <div id="clear-data-confirm" style="display:none;margin-top:8px;padding:10px 12px;background:#FDF0F0;border-radius:var(--radius-sm);border:0.5px solid #E0A0A0;font-size:12px;color:#8A3030;font-family:var(--font-body);font-weight:300;">
-              this will delete all entries permanently.
-              <div style="display:flex;gap:14px;margin-top:8px;">
-                <span onclick="doClearData()" style="cursor:pointer;color:#C46060;font-weight:500">yes, delete everything</span>
-                <span onclick="cancelClearData()" style="cursor:pointer;color:var(--text-muted)">cancel</span>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -874,7 +864,7 @@ body.writing-active .sync-wrap { display: none; }
 const ANCHOR = {
   question: "What do I want to protect about my energy today?",
   category: "protection",
-  updatedDate: "may 16th",
+  updatedDate: "april 3",
   description: `This question lives at the intersection of two things — the cost of performance and what belongs to you before the day gets it. Before you walk in, you're drawing a quiet line. It's not about being guarded, it's about being <em>intentional</em>. Your nervous system spends a lot of energy reacting to what the day demands. This question lets you get there first.`
 };
 
@@ -1020,25 +1010,7 @@ async function forceSync() {
   }
 }
 
-function confirmClearData() {
-  document.getElementById('clear-data-btn').style.display = 'none';
-  document.getElementById('clear-data-confirm').style.display = 'block';
-}
-function cancelClearData() {
-  document.getElementById('clear-data-confirm').style.display = 'none';
-  document.getElementById('clear-data-btn').style.display = '';
-}
-async function doClearData() {
-  appData = { entries: [] };
-  localStorage.removeItem('transitions_v1');
-  localStorage.removeItem('transitions_draft');
-  await saveToSupabase(appData);
-  document.getElementById('home-count').textContent = 'no entries yet — begin below';
-  document.getElementById('lib-count').textContent = 0;
-  renderEntries(); checkDraft();
-  cancelClearData();
-  showToast('all data cleared');
-}
+
 
 let appData = { entries: [] };
 let selectedVibe = null;
