@@ -1569,6 +1569,7 @@ function toggleLibrary() {
   libraryOpen = !libraryOpen;
   document.getElementById('library-panel').classList.toggle('open', libraryOpen);
   document.getElementById('lib-arrow').classList.toggle('open', libraryOpen);
+  if (libraryOpen) renderEntries();
 }
 
 function toggleVibeFilter(vibe, el) {
