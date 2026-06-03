@@ -43,6 +43,84 @@ html, body { background: #1A1728; min-height: 100vh; font-family: -apple-system,
 .btn-reroll:disabled { opacity: 0.3; cursor: not-allowed; }
 .reroll-note { font-size: 11px; color: #7068A0; text-align: right; margin-top: 6px; min-height: 18px; font-style: italic; }
 .season-note { font-size: 11px; color: #4A4270; text-align: center; margin-top: 2rem; font-style: italic; letter-spacing: 0.04em; }
+
+/* ── Soul Therapy section ── */
+.st-divider {
+  display: flex; align-items: center; gap: 10px;
+  margin: 2.5rem 0 1.5rem;
+}
+.st-divider-line { flex: 1; height: 0.5px; background: #3D2535; }
+.st-divider-text {
+  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: #9A6070; font-weight: 500; white-space: nowrap;
+}
+.st-intro {
+  font-size: 12px; color: #7A5060; line-height: 1.7;
+  margin-bottom: 1.25rem; font-style: italic;
+}
+.st-reveal-btn {
+  width: 100%; padding: 11px;
+  background: transparent; border: 0.5px solid #3D2535;
+  border-radius: 10px; font-size: 12px; color: #9A6070;
+  cursor: pointer; letter-spacing: 0.04em;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  transition: all 0.2s;
+}
+.st-reveal-btn:hover { background: #2A1820; color: #C08090; border-color: #5A3045; }
+.st-content { display: none; margin-top: 1rem; }
+.st-content.open { display: block; }
+.st-source-label {
+  font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: #7A5060; margin-bottom: 12px; font-weight: 500;
+}
+.st-question-card {
+  background: #241018; border: 0.5px solid #3D2535;
+  border-radius: 14px; padding: 1.25rem; margin-bottom: 0.75rem;
+}
+.st-question-text {
+  font-size: 15px; line-height: 1.7; color: #E8C0CC;
+  font-family: Georgia, serif; font-weight: normal;
+}
+.st-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 12px;
+}
+.st-nav-btn {
+  background: transparent; border: 0.5px solid #3D2535;
+  border-radius: 8px; padding: 7px 14px;
+  font-size: 11px; color: #7A5060; cursor: pointer;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  transition: all 0.15s; letter-spacing: 0.04em;
+}
+.st-nav-btn:hover { background: #2A1820; color: #C08090; border-color: #5A3045; }
+.st-nav-btn:disabled { opacity: 0.25; cursor: not-allowed; }
+.st-nav-count {
+  font-size: 10px; color: #5A3848; letter-spacing: 0.08em;
+}
+.st-entry-toggle {
+  font-size: 11px; color: #7A5060; cursor: pointer;
+  letter-spacing: 0.04em; margin-top: 12px;
+  display: block; border-bottom: 0.5px solid #3D2535;
+  padding-bottom: 2px; transition: color 0.15s;
+  width: fit-content; -webkit-tap-highlight-color: transparent;
+}
+.st-entry-toggle:hover { color: #C08090; }
+.st-entry-text {
+  display: none; margin-top: 14px;
+  border-left: 1.5px solid #3D2535; padding-left: 14px;
+}
+.st-entry-text.open { display: block; }
+.st-entry-para {
+  font-size: 12px; line-height: 1.9; color: #7A5060;
+  font-family: Georgia, serif;
+  margin-bottom: 14px;
+}
+.st-entry-para:last-child { margin-bottom: 0; }
+.st-entry-num {
+  font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: #9A6070; font-weight: 500; margin-bottom: 4px;
+  display: block;
+}
 </style>
 </head>
 <body>
@@ -81,6 +159,29 @@ html, body { background: #1A1728; min-height: 100vh; font-family: -apple-system,
   <div class="reroll-note" id="reroll-note"></div>
 
   <div class="season-note">anchor revisited seasonally — next check-in: august 2026</div>
+
+  <!-- Soul Therapy -->
+  <div class="st-divider">
+    <div class="st-divider-line"></div>
+    <div class="st-divider-text">or, a conversation with your past self</div>
+    <div class="st-divider-line"></div>
+  </div>
+
+  <p class="st-intro">six questions written for you — to respond to the version of yourself who wrote in january and april 2020. one at a time, no repeats.</p>
+
+  <button class="st-reveal-btn" onclick="revealSoulTherapy()" id="st-btn">tonight, go here instead →</button>
+
+  <div class="st-content" id="st-content">
+    <div class="st-source-label" id="st-source"></div>
+    <div class="st-question-card">
+      <div class="st-question-text" id="st-q"></div>
+    </div>
+    <div class="st-nav">
+      <button class="st-nav-btn" id="st-another" onclick="anotherST()">not tonight →</button>
+    </div>
+    <span class="st-entry-toggle" id="st-toggle" onclick="toggleEntry()">read the original entry ↓</span>
+    <div class="st-entry-text" id="st-entry-text"></div>
+  </div>
 </div>
 
 <script>
@@ -235,6 +336,74 @@ function showQuestion(item) {
   document.getElementById('q-num').style.display = 'block';
   document.getElementById('why-text').innerHTML = item.why;
   document.getElementById('why-wrap').classList.add('visible');
+}
+// ── SOUL THERAPY ──────────────────────────────────────────────────────────
+const ENTRY_JAN_HTML = `
+  <p class="st-entry-para">Thus far, what has surprised me the most about my life is my resilience in the face of adversity and hardships, as well as how my life is equal parts beautiful and ugly. I'll start by saying that every single day of my life surprises me. Every single day that I am here, breathing, I am 100% in awe and beyond thankful. I want to acknowledge and appreciate life for all that it is.</p>
+  <p class="st-entry-para">My resilience in the face of adversity was what came to mind first when I thought about what has surprised me about my life. Maybe it is because of my astrological sign, maybe the DNA passed down from my ancestors, maybe my personality + who I naturally am, or maybe the Universe's doing (I am exactly who I need to be), but if there is one thing I can say about myself, it is that I am strong. I am strong for myself, and often, I am called to be strong for others. I like to think that I answer that calling only for those that I deeply love and appreciate, but my affinity for life makes me extend my response to that calling for even those I'm not too fond of. At times, my strength can even be infectious. This cannot be a mistake — this is a divine plan. I was meant to be exactly who I am.</p>
+  <p class="st-entry-para">I'd like to think that this caliber of strength is (and should be) saved for those who have life much harder than myself. Refugees, sex-trafficked women, women in abusive relationships, those forced to marry or bear children, SLAVES. The list goes on. And yet, here I am, with the strength of 1000. I like to believe that I was given this strength due to my need to touch hearts whenever possible. If I can get through to someone, help them, get them to see something from a different perspective, I am happy. I am at peace. Not many people are as selfless. As a result, I was given this strength, along with this ability to touch hearts, so that I can use them together. They are not two separate gifts, but one gift combined. That is amazing. I am thankful, in awe, and truly surprised.</p>
+  <p class="st-entry-para">In many ways, my life is beautiful and I am happy. In other ways, my life is lacking, stressful, hard, even unfair. But this, in and of itself, is so beautifully surprising to me. I am always in awe of the complex: easy, yet difficult. Beautiful, yet ugly. How one thing can be multiple things. Every single day shows me this. Is there an equal balance? Not at all. But that is all based on perspective. That is a beautifully surprising notion.</p>`;
+
+const ENTRY_APR_HTML = `
+  <p class="st-entry-para"><span class="st-entry-num">1 · passionate / tenacious</span>These words describe me because... well they just do. I am either 100% interested in something, or 0% interested. This causes me to throw myself into things that I care about / that excite me, and as a result, I become very serious + passionate about it. Tenacious goes hand-in-hand, because it is my passion that makes me the kind of person that doesn't take "no" for an answer. I am a true believer in "if there's a will, there's a way" and I will stop at nothing to get what I want.</p>
+  <p class="st-entry-para"><span class="st-entry-num">2 · thoughtful</span>This word describes me because I am able to see things when other people are lacking this quality. Often I observe what people do, and when I say "I would've done this", what I'm usually saying is "I would've considered how someone else might've felt". The only time I'm not thoughtful is when I don't care for someone. I try to always consider how someone else would perceive something.</p>
+  <p class="st-entry-para"><span class="st-entry-num">3 · understanding / forgiving</span>I chose these words because my life has taught me to be this kind of person. I am the physical embodiment of "shit happens". I've witnessed "shit happening", but I've also witnessed bullshit + lies. Excuses. Tales. I let a lot of things roll off, because I truly enjoy the power I have over myself, and I don't want to lose that to anyone else. Life is so completely + utterly random + I can't let every little thing throw me off, upset me, piss me off, make me not trust, etc. So I am understanding of what others are going through, forgiving when they act in a way that is unlike themselves. I am understanding of flaws that exist in some people: some flaws are slip-ups, breaking away from character, but others are built into an individual's DNA. Simultaneously, I am understanding + forgiving with myself, while also setting boundaries + not allowing excuses.</p>
+  <p class="st-entry-para"><span class="st-entry-num">4 · self-motivated / go-getter</span>This is a trait of mine that is built into my genetic code. It is my skin, my bones, my blood, every cell that has ever been + will ever be in my body. I have a lot of grit. Challenges excite me. I enjoy the satisfaction of solving something, or of obtaining something that seemed unattainable. I cannot truly say where this gift came from (thank you Goddesses!) but I know that I live it, breathe it, feel it daily.</p>
+  <p class="st-entry-para"><span class="st-entry-num">5 · cautious / meticulous</span>My love for being observant, identifying risks, exploring options + trying to make smart, calculated decisions, would paint me as a cautious person. I added "meticulous" after doing some writing because there is a method to my madness. I actually consider myself quite risky, but I make calculated risks. Without knowing it, I know that I think deeply about every decision that I make. I don't like being forced to make rash decisions because I believe in the power of research + planning — I've seen what it can do. I am indeed careful, but when it comes to being risky or adventurous, I believe meticulous is the better word.</p>`;
+
+const soulTherapyQuestions = [
+  { entry: 'january 28, 2020', page: '281', prompt: 'what has surprised you the most about your life?', html: ENTRY_JAN_HTML,
+    q: 'You wrote that your resilience still surprises you — that you didn\'t expect to be this strong. Six years later, does it still surprise you, or has it become something you simply know and carry? And is there a cost to that knowing — does familiarity with your own strength ever make it harder to let yourself be held?' },
+  { entry: 'january 28, 2020', page: '281', prompt: 'what has surprised you the most about your life?', html: ENTRY_JAN_HTML,
+    q: 'You described giving your strength to even people you\'re "not too fond of" as something your affinity for life makes you do — not entirely a choice. Has that changed? Do you have more say now over who gets that from you, or is it still somewhat involuntary?' },
+  { entry: 'january 28, 2020', page: '281', prompt: 'what has surprised you the most about your life?', html: ENTRY_JAN_HTML,
+    q: 'You ended this entry on the beauty and ugliness of your life being equally surprising. Right now, in 2026 — what is the most beautifully surprising thing, and what is the most ugly surprising thing?' },
+  { entry: 'april 15, 2020', page: '138', prompt: 'pick five words that describe you best and why.', html: ENTRY_APR_HTML,
+    q: 'In 2020 you described forgiving others as something you do to protect your power over yourself — so you don\'t hand it to someone else. Do you still experience forgiveness that way, or has it shifted into something that feels less strategic and more just... how you move through the world?' },
+  { entry: 'april 15, 2020', page: '138', prompt: 'pick five words that describe you best and why.', html: ENTRY_APR_HTML,
+    q: 'You wrote that thoughtfulness is your default except when you don\'t care for someone — and you said it matter-of-factly, without apology. Six years later, do you still feel that cleanly about it, or has anything complicated that for you?' },
+  { entry: 'april 15, 2020', page: '138', prompt: 'pick five words that describe you best and why.', html: ENTRY_APR_HTML,
+    q: 'You called being self-motivated and a go-getter something built into your DNA — almost like you didn\'t choose it. Are there moments now where that trait costs you something? Where the drive outpaces what your body or your heart actually needs?' }
+];
+
+let lastSTIndex = -1;
+
+function revealSoulTherapy() {
+  document.getElementById('st-content').classList.add('open');
+  document.getElementById('st-btn').style.display = 'none';
+  drawST();
+}
+
+function drawST() {
+  let idx;
+  do { idx = Math.floor(Math.random() * soulTherapyQuestions.length); }
+  while (idx === lastSTIndex && soulTherapyQuestions.length > 1);
+  lastSTIndex = idx;
+  showST(idx);
+}
+
+function anotherST() {
+  drawST();
+}
+
+function showST(idx) {
+  const q = soulTherapyQuestions[idx];
+  document.getElementById('st-source').textContent =
+    'pg. ' + q.page + ' · ' + q.entry + ' — "' + q.prompt + '"';
+  document.getElementById('st-q').textContent = q.q;
+  // Reset entry toggle
+  const entryEl = document.getElementById('st-entry-text');
+  entryEl.innerHTML = q.html;
+  entryEl.classList.remove('open');
+  document.getElementById('st-toggle').textContent = 'read the original entry ↓';
+}
+
+function toggleEntry() {
+  const el = document.getElementById('st-entry-text');
+  const toggle = document.getElementById('st-toggle');
+  const isOpen = el.classList.contains('open');
+  el.classList.toggle('open', !isOpen);
+  toggle.textContent = isOpen ? 'read the original entry ↓' : 'close entry ↑';
 }
 </script>
 </body>
