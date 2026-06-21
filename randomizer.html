@@ -389,7 +389,7 @@ function anotherST() {
 function showST(idx) {
   const q = soulTherapyQuestions[idx];
   document.getElementById('st-source').textContent =
-    'pg. ' + q.page + ' · ' + q.entry + ' — "' + q.prompt + '"';
+    'q' + (idx + 1) + ' · pg. ' + q.page + ' · ' + q.entry + ' — "' + q.prompt + '"';
   document.getElementById('st-q').textContent = q.q;
   // Reset entry toggle
   const entryEl = document.getElementById('st-entry-text');
