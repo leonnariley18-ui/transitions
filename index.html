@@ -37,6 +37,9 @@
   --font-title: 'BioRhyme', Georgia, serif;
   --font-body: 'DM Sans', sans-serif;
   --font-write: 'Playfair Display', Georgia, serif;
+  --pm-accent: #C27A3A;
+  --pm-accent-soft: #F5EFE6;
+  --pm-border: #D4B48A;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -141,36 +144,55 @@ body { font-family: var(--font-body); font-weight: 300; color: var(--text); }
 
 .divider { height: 0.5px; background: var(--border); margin: 4px 0 0; }
 
-.library-toggle {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 2px; cursor: pointer; user-select: none;
-  animation: slideUp 0.4s ease 0.25s both;
+/* ── Mode slider ── */
+.mode-slider { margin: 16px 0 0; animation: slideUp 0.4s ease 0.25s both; }
+.mode-track {
+  position: relative; display: flex; align-items: center;
+  height: 36px; background: var(--bg3); border: 0.5px solid var(--border);
+  border-radius: 18px; padding: 3px;
 }
-.library-toggle-left { display: flex; align-items: center; gap: 8px; }
-.library-label {
-  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--text-muted); font-weight: 400;
+.mode-thumb {
+  position: absolute; top: 3px; left: 3px;
+  width: calc(33.33% - 2px); height: 30px;
+  border-radius: 15px; background: var(--accent);
+  transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), background 0.3s;
+  pointer-events: none; z-index: 0;
 }
-.library-count {
-  font-size: 10px; color: var(--accent);
-  background: var(--accent-soft); border-radius: 20px;
-  padding: 2px 9px; font-weight: 500;
+.mode-thumb.pos-0 { transform: translateX(0); background: var(--accent); }
+.mode-thumb.pos-1 { transform: translateX(calc(100% + 4px)); background: #C27A3A; }
+.mode-thumb.pos-2 { transform: translateX(calc(200% + 8px)); background: #5A5A54; }
+.mode-option {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  font-size: 16px; cursor: pointer; position: relative; z-index: 1;
+  height: 100%; border-radius: 15px; transition: opacity 0.2s;
+  user-select: none;
 }
-.library-arrow {
-  font-size: 12px; color: var(--text-muted);
-  transition: transform 0.25s;
-}
-.library-arrow.open { transform: rotate(180deg); }
+.mode-option.active { opacity: 1; color: #fff; }
+.mode-option:not(.active) { opacity: 0.45; }
 
-.library-panel {
-  overflow: hidden; max-height: 0;
-  transition: max-height 0.4s ease;
+/* ── "at night" neon tag ── */
+#at-night-tag, #at-night-tag-q {
+  font-family: "Brush Script MT", "Segoe Script", cursive;
+  font-size: 13px;
+  color: #C084FC;
+  margin-left: 6px;
+  vertical-align: middle;
+  letter-spacing: 0.02em;
+  transform: rotate(-4deg);
+  display: inline-block;
+  text-transform: none;
+  text-shadow:
+    0 0 6px #C084FC,
+    0 0 12px #A855F7,
+    0 0 20px #9333EA;
+  animation: neon-flicker 4s infinite;
 }
-.library-panel.open { max-height: 2000px; }
-.library-inner {
-  background: var(--bg3); border-radius: var(--radius);
-  border: 0.5px solid var(--border);
-  padding: 14px 16px; margin-top: 4px;
+@keyframes neon-flicker {
+  0%, 95%, 100% { opacity: 1; }
+  96% { opacity: 0.7; }
+  97% { opacity: 1; }
+  98% { opacity: 0.5; }
+  99% { opacity: 1; }
 }
 
 .search-wrap { position: relative; margin-bottom: 12px; }
@@ -653,6 +675,102 @@ body.writing-active .sync-wrap { display: none; }
   font-family: var(--font-body); font-weight: 400;
   letter-spacing: 0.04em; cursor: pointer;
 }
+
+/* ── Afternoon question page ── */
+.pm-separator {
+  display: flex; align-items: center; gap: 8px; margin: 16px 0 12px;
+}
+.pm-sep-line { flex: 1; height: 0.5px; background: var(--border); }
+.pm-sep-text {
+  font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text-muted); white-space: nowrap;
+}
+
+/* PM question rows — inherit .q-row styles, add selected state */
+.q-row.pm-selected { border-color: var(--pm-accent); background: var(--pm-accent-soft); }
+.q-row.pm-selected .q-text { color: var(--text); }
+.q-row.pm-selected .q-plus { color: var(--pm-accent); }
+
+/* morning-bank rows — slightly different bg to distinguish */
+.q-row.morning-bank { background: var(--bg2); }
+.q-row.morning-bank.pm-selected { background: var(--pm-accent-soft); }
+
+/* home anchor card while afternoon mode is active */
+.anchor-card.pm-mode {
+  background: var(--pm-accent-soft); border-color: var(--pm-border);
+}
+.anchor-card.pm-mode .anchor-eyebrow,
+.anchor-card.pm-mode .anchor-chevron { color: var(--pm-accent); }
+
+#page-pm-questions .q-anchor-display {
+  background: var(--pm-accent-soft); border-color: var(--pm-border);
+}
+#page-pm-questions .q-eyebrow { color: var(--pm-accent); }
+#page-pm-questions .info-btn {
+  border-color: var(--pm-border); background: var(--pm-accent-soft); color: var(--pm-accent);
+}
+#page-pm-questions .info-btn.open {
+  background: var(--pm-accent); color: #fff; border-color: var(--pm-accent);
+}
+#page-pm-questions .info-panel-label { color: var(--pm-accent); }
+
+/* ── Writing context chip row ── */
+.context-chip-row {
+  display: flex; gap: 5px; align-items: center;
+  margin-top: 6px; flex-wrap: wrap;
+}
+.mode-tag { font-size: 13px; }
+
+/* ── History screen ── */
+.history-screen { background: #F2F2F0; min-height: 100%; }
+.history-heading { color: #2A2A24; }
+.history-subline { font-size: 11px; color: #888884; margin-bottom: 16px; }
+
+.history-screen .filter-label { color: #AAAAAA; }
+.history-screen .filter-pill {
+  color: #5A5A54; border-color: #C8C8C4; background: #F2F2F0;
+}
+.history-screen .filter-pill:hover { background: #E8E8E4; }
+.history-screen .filter-pill.active-mode-morning {
+  background: #6A5AC0; color: #fff; border-color: #6A5AC0;
+}
+.history-screen .filter-pill.active-mode-afternoon {
+  background: #C27A3A; color: #fff; border-color: #C27A3A;
+}
+.history-screen .filter-pill.active-cat,
+.history-screen .filter-pill.active-vibe {
+  background: #5A5A54; color: #F2F2F0; border-color: #5A5A54;
+}
+.history-screen .search-input {
+  background: #F7F7F5; border-color: #C8C8C4; color: #2A2A24;
+}
+.history-screen .search-input:focus { border-color: #888884; }
+.history-screen .app-name { color: #5A5A54; }
+.history-screen .filter-section { transition: opacity 0.2s; }
+
+/* Entry rows in history — thinner, more archival */
+.history-screen .entry-row {
+  border-bottom: 0.5px solid #E0E0DC;
+  padding: 12px 0;
+  background: transparent;
+}
+.history-screen .entry-row:hover { background: #E8E8E4; }
+.history-screen .entry-date { color: #AAAAAA; }
+.history-screen .entry-title { color: #2A2A24; }
+.history-screen .entry-context-line { color: #888884; }
+.history-screen .entry-context-line strong { color: #5A5A54; }
+.history-screen .entry-q-tag {
+  background: #E8E8E4; color: #5A5A54; border-color: #C8C8C4;
+}
+.history-screen .lib-divider { background: #C8C8C4; }
+.history-screen .export-btn { color: #888884; border-color: #C8C8C4; }
+.history-screen .export-btn:hover { background: #E8E8E4; }
+.history-screen .no-entries { color: #AAAAAA; }
+.history-screen .back-label, .history-screen .back-arrow { color: #888884; }
+.entry-bottom {
+  display: flex; align-items: center; justify-content: flex-end;
+  gap: 5px; margin-top: 4px; font-size: 12px;
+}
 </style>
 </head>
 <body>
@@ -699,7 +817,7 @@ body.writing-active .sync-wrap { display: none; }
     <!-- HOME -->
     <div class="page active" id="page-home">
       <div class="screen-inner">
-        <div class="app-name">transitions</div>
+        <div class="app-name">transitions <span id="at-night-tag" style="display:none">at night</span></div>
         <div class="greeting" id="home-greeting">good morning</div>
         <div class="date-line" id="home-date">—</div>
         <div class="entry-count" id="home-count">—</div>
@@ -715,65 +833,34 @@ body.writing-active .sync-wrap { display: none; }
           </div>
         </div>
 
-        <div class="anchor-card" onclick="handleAnchorTap()">
-          <div>
-            <div class="anchor-eyebrow">anchor — tap to begin</div>
-            <div class="anchor-q" id="home-anchor-q">What do I want to protect about my energy today?</div>
+        <div id="anchor-wrap">
+          <div class="anchor-card" id="anchor-card" onclick="handleAnchorTap()">
+            <div>
+              <div class="anchor-eyebrow" id="anchor-eyebrow">anchor — tap to begin</div>
+              <div class="anchor-q" id="home-anchor-q">What do I want to protect about my energy today?</div>
+            </div>
+            <div class="anchor-chevron">›</div>
           </div>
-          <div class="anchor-chevron">›</div>
-        </div>
-        <div class="anchor-meta">currently: <strong id="home-anchor-cat">protection</strong> · last updated <span id="home-anchor-date">—</span></div>
+          <div class="anchor-meta" id="anchor-meta">currently: <strong id="home-anchor-cat">protection</strong> · last updated <span id="home-anchor-date">—</span></div>
 
-        <div class="anchor-desc" id="home-anchor-desc"></div>
+          <div class="anchor-desc" id="home-anchor-desc"></div>
+        </div>
 
         <div class="divider"></div>
 
-        <div class="library-toggle" onclick="toggleLibrary()">
-          <div class="library-toggle-left">
-            <span class="library-label">past entries</span>
-            <span class="library-count" id="lib-count">0</span>
-          </div>
-          <span class="library-arrow" id="lib-arrow">▾</span>
-        </div>
-
-        <div class="library-panel" id="library-panel">
-          <div class="library-inner">
-            <div class="search-wrap">
-              <span class="search-icon">⌕</span>
-              <input class="search-input" id="search-input" placeholder="search your entries…" oninput="filterEntries()" />
+        <div class="mode-slider" id="mode-slider">
+          <div class="mode-track">
+            <div class="mode-thumb" id="mode-thumb"></div>
+            <div class="mode-option" data-mode="morning" onclick="setMode('morning')">☀</div>
+            <div class="mode-option" data-mode="afternoon" onclick="setMode('afternoon')">🌙</div>
+            <div class="mode-option" data-mode="history" onclick="setMode('history')">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
             </div>
-
-            <div class="filter-section">
-              <div class="filter-label">by vibe</div>
-              <div class="filter-pills" id="vibe-filters">
-                <span class="filter-pill" data-vibe="scattered" onclick="toggleVibeFilter('scattered',this)">scattered</span>
-                <span class="filter-pill" data-vibe="heavy" onclick="toggleVibeFilter('heavy',this)">heavy</span>
-                <span class="filter-pill" data-vibe="anxious" onclick="toggleVibeFilter('anxious',this)">anxious</span>
-                <span class="filter-pill" data-vibe="clear" onclick="toggleVibeFilter('clear',this)">clear</span>
-                <span class="filter-pill" data-vibe="okay" onclick="toggleVibeFilter('okay',this)">okay</span>
-              </div>
-            </div>
-
-            <div class="filter-section">
-              <div class="filter-label">by category</div>
-              <div class="filter-pills" id="cat-filters">
-                <span class="filter-pill" data-cat="protection" onclick="toggleCatFilter('protection',this)">protection</span>
-                <span class="filter-pill" data-cat="release" onclick="toggleCatFilter('release',this)">release</span>
-                <span class="filter-pill" data-cat="intention" onclick="toggleCatFilter('intention',this)">intention</span>
-                <span class="filter-pill" data-cat="boundary" onclick="toggleCatFilter('boundary',this)">boundary</span>
-                <span class="filter-pill" data-cat="grounding" onclick="toggleCatFilter('grounding',this)">grounding</span>
-                <span class="filter-pill" data-cat="self-compassion" onclick="toggleCatFilter('self-compassion',this)">self-compassion</span>
-                <span class="filter-pill" data-cat="body scan" onclick="toggleCatFilter('body scan',this)">body scan</span>
-                <span class="filter-pill" data-cat="presence" onclick="toggleCatFilter('presence',this)">presence</span>
-                <span class="filter-pill" data-cat="awareness" onclick="toggleCatFilter('awareness',this)">awareness</span>
-              </div>
-            </div>
-
-            <div class="lib-divider"></div>
-            <div id="entries-list"></div>
-
-            <button class="export-btn" onclick="exportEntries()">↓ export entries</button>
-
           </div>
         </div>
 
@@ -843,6 +930,38 @@ body.writing-active .sync-wrap { display: none; }
       </div>
     </div>
 
+    <!-- PM QUESTIONS -->
+    <div class="page" id="page-pm-questions">
+      <div class="screen-inner">
+        <div class="app-name">transitions <span id="at-night-tag-q" style="display:none">at night</span></div>
+        <div class="back-row" onclick="goBack('page-home')">
+          <span class="back-arrow">‹</span>
+          <span class="back-label">back</span>
+        </div>
+        <div class="page-heading">what's on your mind?</div>
+        <div class="page-sub">pick one or more, or go straight in.</div>
+
+        <div class="q-anchor-display" onclick="goToPMWriting()" style="cursor:pointer">
+          <div class="q-eyebrow">tap to begin writing</div>
+          <div class="q-anchor-text">time to wind down. what did today actually bring?</div>
+          <div style="text-align:right;margin-top:8px;font-size:11px;
+            color:var(--pm-accent);font-family:var(--font-body);
+            font-weight:400;letter-spacing:0.04em;">let's write →</div>
+        </div>
+
+        <div class="pick-label">this afternoon</div>
+        <div id="pm-questions-section"></div>
+
+        <div class="pm-separator">
+          <div class="pm-sep-line"></div>
+          <div class="pm-sep-text">reworded, from the morning bank</div>
+          <div class="pm-sep-line"></div>
+        </div>
+
+        <div id="pm-morning-section"></div>
+      </div>
+    </div>
+
     <!-- WRITING -->
     <div class="page" id="page-writing">
       <div class="writing-page-inner">
@@ -852,7 +971,7 @@ body.writing-active .sync-wrap { display: none; }
             <div class="writing-btn-row">
               <span class="autosaved-label" id="autosaved-label">autosaved</span>
               <button class="draft-btn" onclick="saveDraft()">save draft</button>
-              <button class="save-btn-inline" onclick="saveEntry()">save</button>
+              <button class="save-btn-inline" onclick="currentMode === 'afternoon' ? savePMEntry() : saveEntry()">save</button>
             </div>
           </div>
         </div>
@@ -861,6 +980,81 @@ body.writing-active .sync-wrap { display: none; }
           <input class="title-input" id="title-input" placeholder="title your morning…" />
         </div>
         <div class="quill-wrap"><div id="quill-editor"></div></div>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="page" id="page-history">
+      <div class="screen-inner history-screen">
+        <div class="app-name">transitions</div>
+        <div class="back-row" onclick="setMode('morning')">
+          <span class="back-arrow">‹</span>
+          <span class="back-label">back</span>
+        </div>
+        <div class="page-heading history-heading">your entries.</div>
+        <div class="history-subline" id="history-subline"></div>
+
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input class="search-input" id="history-search-input"
+            placeholder="search your entries…"
+            oninput="renderHistory()" />
+        </div>
+
+        <div class="filter-section">
+          <div class="filter-label">by mode</div>
+          <div class="filter-pills" id="mode-filters">
+            <span class="filter-pill" data-mode="morning"
+              onclick="toggleModeFilter('morning',this)">☀️ morning</span>
+            <span class="filter-pill" data-mode="afternoon"
+              onclick="toggleModeFilter('afternoon',this)">🌙 afternoon</span>
+          </div>
+        </div>
+
+        <div class="filter-section" id="history-vibe-section">
+          <div class="filter-label">by vibe</div>
+          <div class="filter-pills" id="history-vibe-filters">
+            <span class="filter-pill" data-vibe="scattered"
+              onclick="toggleHistoryVibeFilter('scattered',this)">scattered</span>
+            <span class="filter-pill" data-vibe="heavy"
+              onclick="toggleHistoryVibeFilter('heavy',this)">heavy</span>
+            <span class="filter-pill" data-vibe="anxious"
+              onclick="toggleHistoryVibeFilter('anxious',this)">anxious</span>
+            <span class="filter-pill" data-vibe="clear"
+              onclick="toggleHistoryVibeFilter('clear',this)">clear</span>
+            <span class="filter-pill" data-vibe="okay"
+              onclick="toggleHistoryVibeFilter('okay',this)">okay</span>
+          </div>
+        </div>
+
+        <div class="filter-section">
+          <div class="filter-label">by category</div>
+          <div class="filter-pills" id="history-cat-filters">
+            <span class="filter-pill" data-cat="protection"
+              onclick="toggleHistoryCatFilter('protection',this)">protection</span>
+            <span class="filter-pill" data-cat="release"
+              onclick="toggleHistoryCatFilter('release',this)">release</span>
+            <span class="filter-pill" data-cat="intention"
+              onclick="toggleHistoryCatFilter('intention',this)">intention</span>
+            <span class="filter-pill" data-cat="boundary"
+              onclick="toggleHistoryCatFilter('boundary',this)">boundary</span>
+            <span class="filter-pill" data-cat="grounding"
+              onclick="toggleHistoryCatFilter('grounding',this)">grounding</span>
+            <span class="filter-pill" data-cat="self-compassion"
+              onclick="toggleHistoryCatFilter('self-compassion',this)">self-compassion</span>
+            <span class="filter-pill" data-cat="body scan"
+              onclick="toggleHistoryCatFilter('body scan',this)">body scan</span>
+            <span class="filter-pill" data-cat="presence"
+              onclick="toggleHistoryCatFilter('presence',this)">presence</span>
+            <span class="filter-pill" data-cat="awareness"
+              onclick="toggleHistoryCatFilter('awareness',this)">awareness</span>
+          </div>
+        </div>
+
+        <div class="lib-divider"></div>
+        <div id="history-viewer-wrap" style="display:none"></div>
+        <div id="history-entries-list"></div>
+        <button class="export-btn" onclick="exportEntries()">↓ export entries</button>
       </div>
     </div>
 
@@ -882,7 +1076,11 @@ const QUESTIONS = [
   {
     id: 'q1', text: "What would good enough look like today?", category: "self-compassion",
     vibes: ['scattered','heavy','okay'],
-    why: "Perfectionism and guilt are physiological — they keep your nervous system in a low-grade threat state all day, scanning for where you fell short. By defining \"good enough\" in the morning, you give your brain a finish line it can actually reach."
+    why: "Perfectionism and guilt are physiological — they keep your nervous system in a low-grade threat state all day, scanning for where you fell short. By defining \"good enough\" in the morning, you give your brain a finish line it can actually reach.",
+    pm: {
+      text: "Did I let good enough be enough today?",
+      why: "You set a bar this morning. This asks whether you held it with any mercy. Perfectionism doesn't clock out at 5pm — it follows you onto the train and runs the day's footage looking for where you fell short. This question interrupts that. The day is done. Whatever it was, it was enough to get you here."
+    }
   },
   {
     id: 'q2', text: "What's one thing I'm bringing my full attention to today?", category: "intention",
@@ -917,7 +1115,24 @@ const QUESTIONS = [
   {
     id: 'q8', text: "Is there anything I'm carrying from yesterday that isn't mine to carry today?", category: "release",
     vibes: ['heavy'],
-    why: "This is the morning complement to your night anchor. It asks whether what you're holding even belongs to you anymore. Sometimes the weight from yesterday is residual, not relevant. Naming that distinction means you're not dragging old energy into new situations."
+    why: "This is the morning complement to your night anchor. It asks whether what you're holding even belongs to you anymore. Sometimes the weight from yesterday is residual, not relevant. Naming that distinction means you're not dragging old energy into new situations.",
+    pm: {
+      text: "Is there anything I'm carrying from today that isn't mine to bring home?",
+      why: "The morning version of this asked about yesterday's weight. The afternoon version asks about today's — specifically the parts that belong to someone else's stress, someone else's urgency, someone else's bad day that landed on you. You absorbed things today that weren't yours. This is the prompt to set them down before you walk through your door."
+    }
+  },
+];
+
+const PM_QUESTIONS = [
+  {
+    id: 'q9', text: "Where did today actually take me, versus where I thought it was going?",
+    category: "awareness",
+    why: "The morning version of you had a plan, or at least an expectation. This question asks you to close the gap between that and what actually happened — not to judge the difference, but to notice it. Most days don't go where we aimed. Naming that gap on the way home means you're processing the day rather than just carrying it."
+  },
+  {
+    id: 'q10', text: "What does my body need in the next two hours? My spirit? My mind?",
+    category: "body scan",
+    why: "Three different registers, three potentially different answers. Your body might need to lie flat. Your spirit might need music or quiet or someone you love. Your mind might need to stop. Asking all three separately is the point — collapsing them into one answer usually means the loudest one wins and the others go unmet."
   },
 ];
 
@@ -1012,7 +1227,8 @@ async function forceSync() {
     await saveToSupabase(appData);
     appData = await loadFromSupabase();
     setSyncDot('');
-    renderEntries();
+    updateHomeCount();
+    renderHistory();
     showToast('synced ✓');
   } catch(e) {
     setSyncDot('error');
@@ -1028,10 +1244,16 @@ let selectedQuestion = null;
 let currentFontSize = 15;
 let activeTextColor = null;
 let activeHighlight = null;
-let activeVibeFilters = [];
-let activeCatFilters = [];
-let libraryOpen = false;
 let openInfoId = null;
+
+// ── MODE ──────────────────────────────────────────────────────────────────
+let currentMode = 'morning';
+let selectedPMQuestions = []; // array — multiple selection allowed
+
+// history filter state
+let activeModeFilters = [];
+let historyVibeFilters = [];
+let historyCatFilters = [];
 
 const TEXT_FONTS = [
   { label: 'Crimson Pro',       value: "'Crimson Pro', Georgia, serif",             quill: 'crimson-pro' },
@@ -1147,12 +1369,7 @@ function initUI() {
   document.getElementById('home-date').textContent =
     now.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' }).toLowerCase();
 
-  const count = appData.entries.length;
-  document.getElementById('home-count').textContent =
-    count === 0 ? 'no entries yet — begin below' :
-    count === 1 ? '1 entry' :
-    `${count} entries`;
-  document.getElementById('lib-count').textContent = count;
+  updateHomeCount();
 
   document.getElementById('home-anchor-q').textContent = ANCHOR.question;
   document.getElementById('home-anchor-cat').textContent = ANCHOR.category;
@@ -1164,8 +1381,8 @@ function initUI() {
     now.toLocaleDateString('en-US', { weekday:'short', month:'long', day:'numeric' }).toLowerCase();
 
   buildFontPills();
-  buildColorSwatches();
-  renderEntries();
+  renderHistory();
+  setMode('morning');
   checkDraft();
 };
 
@@ -1239,6 +1456,52 @@ function handleAnchorTap() {
   } else {
     goToVibe();
   }
+}
+
+// ── MODE SWITCHING ────────────────────────────────────────────────────────
+function setNightTag(on) {
+  document.getElementById('at-night-tag').style.display = on ? 'inline' : 'none';
+  document.getElementById('at-night-tag-q').style.display = on ? 'inline' : 'none';
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  const thumb = document.getElementById('mode-thumb');
+  const opts = document.querySelectorAll('.mode-option');
+  const pos = { morning: 0, afternoon: 1, history: 2 }[mode];
+  thumb.className = 'mode-thumb pos-' + pos;
+  opts.forEach(o => o.classList.toggle('active', o.dataset.mode === mode));
+
+  // afternoon neon tag + anchor card palette
+  setNightTag(mode === 'afternoon');
+  document.getElementById('anchor-card').classList.toggle('pm-mode', mode === 'afternoon');
+
+  // anchor card
+  if (mode === 'morning') {
+    document.getElementById('anchor-wrap').style.display = 'block';
+    document.getElementById('home-anchor-q').textContent = ANCHOR.question;
+    document.getElementById('anchor-eyebrow').textContent = 'anchor — tap to begin';
+    document.getElementById('anchor-meta').innerHTML =
+      `currently: <strong id="home-anchor-cat">${ANCHOR.category}</strong> · last updated <span id="home-anchor-date">${ANCHOR.updatedDate}</span>`;
+    document.getElementById('home-anchor-desc').innerHTML = ANCHOR.description;
+    document.getElementById('anchor-card').onclick = handleAnchorTap;
+  } else if (mode === 'afternoon') {
+    document.getElementById('anchor-wrap').style.display = 'block';
+    document.getElementById('home-anchor-q').textContent =
+      'time to wind down. what did today actually bring?';
+    document.getElementById('anchor-eyebrow').textContent = 'afternoon — tap to begin';
+    document.getElementById('anchor-meta').textContent = 'established august 16, 2026';
+    document.getElementById('home-anchor-desc').innerHTML = '';
+    document.getElementById('anchor-card').onclick = handlePMAnchorTap;
+  } else {
+    document.getElementById('anchor-wrap').style.display = 'none';
+    closeViewer();
+    showPage('page-history');
+    renderHistory();
+    return;
+  }
+  closeViewer();
+  showPage('page-home');
 }
 
 // ── NAV ───────────────────────────────────────────────────────────────────
@@ -1363,6 +1626,91 @@ function selectQ(id) {
   row.classList.remove('dimmed');
 }
 
+// ── PM QUESTIONS ──────────────────────────────────────────────────────────
+function buildPMQuestionScreen() {
+  selectedPMQuestions = [];
+
+  // PM-only questions (q9, q10)
+  const pmEl = document.getElementById('pm-questions-section');
+  pmEl.innerHTML = PM_QUESTIONS.map(q => renderPMRow(q, false)).join('');
+
+  // Morning bank questions (q1, q8 — pm reword)
+  const morningBank = QUESTIONS.filter(q => q.pm);
+  const mEl = document.getElementById('pm-morning-section');
+  mEl.innerHTML = morningBank.map(q => renderPMRow(q, true)).join('');
+}
+
+function renderPMRow(q, isMorningBank) {
+  const text = isMorningBank ? q.pm.text : q.text;
+  const why = isMorningBank ? q.pm.why : q.why;
+  const extraClass = isMorningBank ? ' morning-bank' : '';
+  return `<div class="q-row${extraClass}" id="pmrow-${q.id}">
+    <div class="q-row-inner">
+      <div class="q-text">${text}</div>
+      <div class="q-actions">
+        <div class="info-btn" id="pminfo-${q.id}" onclick="togglePMInfo('${q.id}')">i</div>
+        <div class="q-plus" id="pmplus-${q.id}" onclick="togglePMQ('${q.id}')">+</div>
+      </div>
+    </div>
+    <div id="pminfo-panel-${q.id}" style="display:none">
+      <div class="info-panel">
+        <div class="info-panel-label">why this question</div>
+        <div class="info-panel-text">${why}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function togglePMQ(id) {
+  const idx = selectedPMQuestions.indexOf(id);
+  const row = document.getElementById(`pmrow-${id}`);
+  const plus = document.getElementById(`pmplus-${id}`);
+  if (idx > -1) {
+    selectedPMQuestions.splice(idx, 1);
+    row.classList.remove('pm-selected');
+    plus.textContent = '+';
+  } else {
+    selectedPMQuestions.push(id);
+    row.classList.add('pm-selected');
+    plus.textContent = '✓';
+  }
+}
+
+function togglePMInfo(id) {
+  const panel = document.getElementById(`pminfo-panel-${id}`);
+  const btn = document.getElementById(`pminfo-${id}`);
+  const isOpen = panel.style.display !== 'none';
+  // close all pm info panels first
+  document.querySelectorAll('[id^=pminfo-panel-]').forEach(p => {
+    p.style.display = 'none';
+    const b = document.getElementById(p.id.replace('panel-', ''));
+    if (b) b.classList.remove('open');
+  });
+  panel.style.display = isOpen ? 'none' : 'block';
+  btn.classList.toggle('open', !isOpen);
+}
+
+function handlePMAnchorTap() {
+  buildPMQuestionScreen();
+  showPage('page-pm-questions');
+}
+
+function goToPMWriting() {
+  buildPMWritingContext();
+  const titleEl = document.getElementById('title-input');
+  titleEl.value = '';
+  titleEl.placeholder = 'title your afternoon…';
+  titleEl.style.fontFamily = TITLE_FONT;
+  document.getElementById('writing-date-label').textContent =
+    new Date().toLocaleDateString('en-US', { weekday:'short', month:'long', day:'numeric' }).toLowerCase();
+  document.body.classList.add('writing-active');
+  showPage('page-writing');
+  initQuill();
+  quill.setContents([]); quill.enable();
+  startAutosave();
+  setTimeout(() => quill.focus(), 300);
+}
+
 // ── QUILL ─────────────────────────────────────────────────────────────────
 let quill = null;
 
@@ -1463,10 +1811,47 @@ function buildWritingContext() {
     `<div class="context-q-item"><span class="context-q-label">${item.label}</span>${item.text}</div>`
   ).join('');
 
+  const modeTag = `<span class="mode-tag am-tag">☀</span>`;
+  const qChip = q ? `<span class="entry-q-tag">${q.id.toUpperCase()}</span>` : '';
+
   document.getElementById('writing-context').innerHTML = `
     <span>${contextLine}</span>
     <span class="context-info-btn" onclick="toggleContextReveal(this)">i</span>
-    <div class="context-questions-reveal">${questionsHTML}</div>`;
+    <div class="context-questions-reveal">${questionsHTML}</div>
+    <div class="context-chip-row">${modeTag}${qChip}</div>`;
+}
+
+function buildPMWritingContext() {
+  // Resolve which questions were selected
+  const allPM = [...PM_QUESTIONS, ...QUESTIONS.filter(q => q.pm)];
+  const selected = selectedPMQuestions.map(id => allPM.find(q => q.id === id)).filter(Boolean);
+  const uniqueCats = [...new Set(selected.map(q => q.category).filter(Boolean))];
+
+  const contextLine = selected.length
+    ? `wrote through ${uniqueCats.join(' + ')}`
+    : 'wrote through winding down';
+
+  // Build chip row: mode tag + Q chips
+  const modeTag = `<span class="mode-tag pm-tag">🌙</span>`;
+  const qChips = selected.map(q =>
+    `<span class="entry-q-tag">${q.id.toUpperCase()}</span>`
+  ).join('');
+
+  // Questions reveal list
+  const questionsHTML = selected.map(q => {
+    const text = q.pm ? q.pm.text : q.text;
+    return `<div class="context-q-item">
+      <span class="context-q-label">${q.id}</span>${text}
+    </div>`;
+  }).join('') || `<div class="context-q-item">
+    <span class="context-q-label">pm</span>time to wind down. what did today actually bring?
+  </div>`;
+
+  document.getElementById('writing-context').innerHTML = `
+    <span>${contextLine}</span>
+    <span class="context-info-btn" onclick="toggleContextReveal(this)">i</span>
+    <div class="context-questions-reveal">${questionsHTML}</div>
+    <div class="context-chip-row">${modeTag}${qChips}</div>`;
 }
 
 function toggleContextReveal(btn) {
@@ -1477,6 +1862,7 @@ function toggleContextReveal(btn) {
 function goToWriting() {
   buildWritingContext();
   document.getElementById('title-input').value = '';
+  document.getElementById('title-input').placeholder = 'title your morning…';
   document.getElementById('title-input').style.fontFamily = TITLE_FONT;
   document.getElementById('writing-date-label').textContent =
     new Date().toLocaleDateString('en-US', { weekday:'short', month:'long', day:'numeric' }).toLowerCase();
@@ -1496,6 +1882,7 @@ function saveEntry() {
   const q = selectedQuestion ? QUESTIONS.find(q => q.id === selectedQuestion) : null;
   const entry = {
     id: Date.now(),
+    mode: 'morning',
     date: fmt(new Date()),
     dateDisplay: new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }),
     title: title || null,
@@ -1508,10 +1895,8 @@ function saveEntry() {
     secondQId: q ? q.id : null,
   };
   appData.entries.unshift(entry); save(); clearDraft();
-  document.getElementById('home-count').textContent =
-    appData.entries.length === 1 ? '1 entry' : `${appData.entries.length} entries`;
-  document.getElementById('lib-count').textContent = appData.entries.length;
-  renderEntries();
+  updateHomeCount();
+  renderHistory();
   selectedVibe = null; selectedQuestion = null;
   document.querySelectorAll('.vibe-btn, .vibe-single').forEach(b => b.classList.remove('selected'));
   const btn = document.getElementById('vibe-next-btn');
@@ -1521,22 +1906,88 @@ function saveEntry() {
   showPage('page-home'); showToast('entry saved \u2728');
 }
 
-function saveDraft() {
+function savePMEntry() {
   const title = document.getElementById('title-input').value.trim();
-  const q = selectedQuestion ? QUESTIONS.find(q => q.id === selectedQuestion) : null;
-  localStorage.setItem('transitions_draft', JSON.stringify({
+  if (!quill) { showToast('write something first \u2728'); return; }
+  const bodyText = quill.getText().trim();
+  if (!bodyText) { showToast('write something first \u2728'); return; }
+
+  const allPM = [...PM_QUESTIONS, ...QUESTIONS.filter(q => q.pm)];
+  const selected = selectedPMQuestions.map(id => allPM.find(q => q.id === id)).filter(Boolean);
+  const cats = [...new Set(selected.map(q => q.category).filter(Boolean))];
+
+  const entry = {
+    id: Date.now(),
+    mode: 'afternoon',
+    date: fmt(new Date()),
+    dateDisplay: new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }),
+    title: title || null,
+    body: bodyText, bodyHTML: quill.root.innerHTML,
+    bodyDelta: JSON.stringify(quill.getContents()),
+    vibe: null,
+    cats: cats.length ? cats : ['winding down'],
+    anchorQ: null,
+    pmQuestionIds: [...selectedPMQuestions],
+    secondQ: selected[0] ? (selected[0].pm ? selected[0].pm.text : selected[0].text) : null,
+    secondQId: selected[0] ? selected[0].id.toUpperCase() : null,
+  };
+
+  appData.entries.unshift(entry); save(); clearDraft();
+  updateHomeCount();
+  renderHistory();
+  selectedPMQuestions = [];
+  stopAutosave();
+  document.body.classList.remove('writing-active');
+  showPage('page-home');
+  showToast('entry saved \u2728');
+}
+
+function updateHomeCount() {
+  const count = appData.entries.length;
+  document.getElementById('home-count').textContent =
+    count === 0 ? 'no entries yet \u2014 begin below' :
+    count === 1 ? '1 entry' :
+    `${count} entries`;
+}
+
+// Build the draft payload for whichever mode is active, so the correct save
+// path is used when the draft is resumed.
+function buildDraftPayload() {
+  const title = document.getElementById('title-input')?.value.trim() || '';
+  const base = {
     title,
     body: quill ? quill.getText().trim() : '',
     bodyHTML: quill ? quill.root.innerHTML : '',
     bodyDelta: quill ? JSON.stringify(quill.getContents()) : '',
+    mode: currentMode === 'afternoon' ? 'afternoon' : 'morning',
+    savedAt: new Date().toISOString(),
+  };
+  if (base.mode === 'afternoon') {
+    const allPM = [...PM_QUESTIONS, ...QUESTIONS.filter(q => q.pm)];
+    const selected = selectedPMQuestions.map(id => allPM.find(q => q.id === id)).filter(Boolean);
+    const cats = [...new Set(selected.map(q => q.category).filter(Boolean))];
+    return Object.assign(base, {
+      vibe: null,
+      cats: cats.length ? cats : ['winding down'],
+      pmQuestionIds: [...selectedPMQuestions],
+      anchorQ: null,
+      secondQ: selected[0] ? (selected[0].pm ? selected[0].pm.text : selected[0].text) : null,
+      secondQId: selected[0] ? selected[0].id.toUpperCase() : null,
+    });
+  }
+  const q = selectedQuestion ? QUESTIONS.find(x => x.id === selectedQuestion) : null;
+  return Object.assign(base, {
     vibe: selectedVibe,
     cats: ['protection', q ? q.category : null].filter(Boolean),
     selectedQuestion,
     anchorQ: ANCHOR.question,
     secondQ: q ? q.text : null,
     secondQId: q ? q.id : null,
-    savedAt: new Date().toISOString(),
-  }));
+  });
+}
+
+function saveDraft() {
+  localStorage.setItem('transitions_draft', JSON.stringify(buildDraftPayload()));
   stopAutosave();
   document.body.classList.remove('writing-active');
   showPage('page-home'); checkDraft(); showToast('draft saved \uD83C\uDF19');
@@ -1546,13 +1997,25 @@ function resumeDraft() {
   const raw = localStorage.getItem('transitions_draft');
   if (!raw) return;
   const draft = JSON.parse(raw);
-  selectedVibe = draft.vibe || null;
-  selectedQuestion = draft.selectedQuestion || null;
-  document.getElementById('title-input').value = draft.title || '';
-  document.getElementById('title-input').style.fontFamily = TITLE_FONT;
+  const draftMode = draft.mode || 'morning';
+  const titleEl = document.getElementById('title-input');
+  titleEl.value = draft.title || '';
+  titleEl.style.fontFamily = TITLE_FONT;
   document.getElementById('writing-date-label').textContent =
     new Date().toLocaleDateString('en-US', { weekday:'short', month:'long', day:'numeric' }).toLowerCase();
-  buildWritingContext();
+
+  if (draftMode === 'afternoon') {
+    setMode('afternoon');
+    selectedPMQuestions = draft.pmQuestionIds ? [...draft.pmQuestionIds] : [];
+    titleEl.placeholder = 'title your afternoon…';
+    buildPMWritingContext();
+  } else {
+    setMode('morning');
+    selectedVibe = draft.vibe || null;
+    selectedQuestion = draft.selectedQuestion || null;
+    titleEl.placeholder = 'title your morning…';
+    buildWritingContext();
+  }
   document.body.classList.add('writing-active');
   showPage('page-writing'); initQuill();
   try {
@@ -1564,35 +2027,51 @@ function resumeDraft() {
   setTimeout(() => quill.focus(), 300);
 }
 
-// ── LIBRARY ───────────────────────────────────────────────────────────────
-function toggleLibrary() {
-  libraryOpen = !libraryOpen;
-  document.getElementById('library-panel').classList.toggle('open', libraryOpen);
-  document.getElementById('lib-arrow').classList.toggle('open', libraryOpen);
-  if (libraryOpen) renderEntries();
+// ── HISTORY ───────────────────────────────────────────────────────────────
+function toggleModeFilter(mode, el) {
+  const idx = activeModeFilters.indexOf(mode);
+  const activeClass = 'active-mode-' + mode;
+  if (idx > -1) { activeModeFilters.splice(idx, 1); el.className = 'filter-pill'; }
+  else { activeModeFilters.push(mode); el.className = 'filter-pill ' + activeClass; }
+  // dim the vibe filters when afternoon-only is selected — pm entries have no vibe
+  const vibeSection = document.getElementById('history-vibe-section');
+  if (activeModeFilters.length === 1 && activeModeFilters[0] === 'afternoon') {
+    vibeSection.style.opacity = '0.35';
+    vibeSection.style.pointerEvents = 'none';
+  } else {
+    vibeSection.style.opacity = '1';
+    vibeSection.style.pointerEvents = 'auto';
+  }
+  renderHistory();
 }
 
-function toggleVibeFilter(vibe, el) {
-  const idx = activeVibeFilters.indexOf(vibe);
-  if (idx > -1) { activeVibeFilters.splice(idx, 1); el.className = 'filter-pill'; }
-  else { activeVibeFilters.push(vibe); el.className = `filter-pill active-vibe-${vibe}`; }
-  renderEntries();
+function toggleHistoryVibeFilter(vibe, el) {
+  const idx = historyVibeFilters.indexOf(vibe);
+  if (idx > -1) { historyVibeFilters.splice(idx, 1); el.className = 'filter-pill'; }
+  else { historyVibeFilters.push(vibe); el.className = 'filter-pill active-vibe'; }
+  renderHistory();
 }
 
-function toggleCatFilter(cat, el) {
-  const idx = activeCatFilters.indexOf(cat);
-  if (idx > -1) { activeCatFilters.splice(idx, 1); el.className = 'filter-pill'; }
-  else { activeCatFilters.push(cat); el.className = 'filter-pill active-cat'; }
-  renderEntries();
+function toggleHistoryCatFilter(cat, el) {
+  const idx = historyCatFilters.indexOf(cat);
+  if (idx > -1) { historyCatFilters.splice(idx, 1); el.className = 'filter-pill'; }
+  else { historyCatFilters.push(cat); el.className = 'filter-pill active-cat'; }
+  renderHistory();
 }
 
-function filterEntries() { renderEntries(); }
+function renderHistory() {
+  const now = new Date();
+  const h = now.getHours();
+  const greet = h < 12 ? 'good morning' : h < 17 ? 'good afternoon' : 'good evening';
+  document.getElementById('history-subline').textContent =
+    greet + ' · ' + now.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' }).toLowerCase();
 
-function renderEntries() {
-  const query = (document.getElementById('search-input')?.value || '').toLowerCase();
+  const query = (document.getElementById('history-search-input')?.value || '').toLowerCase();
   let entries = [...appData.entries];
-  if (activeVibeFilters.length) entries = entries.filter(e => activeVibeFilters.includes(e.vibe));
-  if (activeCatFilters.length) entries = entries.filter(e => e.cats && e.cats.some(c => activeCatFilters.includes(c)));
+  // mode filter — a missing mode means morning
+  if (activeModeFilters.length) entries = entries.filter(e => activeModeFilters.includes(e.mode || 'morning'));
+  if (historyVibeFilters.length) entries = entries.filter(e => historyVibeFilters.includes(e.vibe));
+  if (historyCatFilters.length) entries = entries.filter(e => e.cats && e.cats.some(c => historyCatFilters.includes(c)));
   if (query) {
     const MONTHS = { jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11,
       january:0,february:1,march:2,april:3,june:5,july:6,august:7,september:8,october:9,november:10,december:11 };
@@ -1612,33 +2091,48 @@ function renderEntries() {
         (e.secondQId || '').toLowerCase().includes(query);
     });
   }
-  const el = document.getElementById('entries-list');
+  const el = document.getElementById('history-entries-list');
   if (!entries.length) { el.innerHTML = '<div class="no-entries">no entries found</div>'; return; }
   el.innerHTML = entries.map(e => {
+    const mode = e.mode || 'morning';
+    const modeEmoji = mode === 'afternoon' ? '\ud83c\udf19' : '\u2600\ufe0f';
     const catsStr = e.cats ? e.cats.join(' + ') : 'protection';
     const vibeStr = e.vibe ? `arrived <strong>${e.vibe}</strong> \u00b7 ` : '';
     const titleDisplay = e.title || 'untitled';
-    const qTag = e.secondQId ? `<span class="entry-q-tag">${e.secondQId}</span>` : '';
-    return `<div class="entry-row" onclick="viewEntry(${e.id})">
+    const qId = e.secondQId || (e.pmQuestionIds && e.pmQuestionIds[0] ? e.pmQuestionIds[0] : null);
+    const qTag = qId ? `<span class="entry-q-tag">${qId.toUpperCase()}</span>` : '';
+    return `<div class="entry-row" onclick="viewHistoryEntry(${e.id})">
       <div class="entry-top">
         <span class="entry-date">${e.dateDisplay || e.date}</span>
         <span class="entry-title">${titleDisplay}</span>
       </div>
-      <div class="entry-context-line">${vibeStr}wrote through ${catsStr}${qTag}</div>
+      <div class="entry-context-line">${vibeStr}wrote through ${catsStr}</div>
+      <div class="entry-bottom">${modeEmoji} ${qTag}</div>
     </div>`;
   }).join('');
 }
 
+function viewHistoryEntry(id) { viewEntry(id); }
+
 function viewEntry(id) {
   const entry = appData.entries.find(e => e.id === id);
   if (!entry) return;
-  const wrap = document.getElementById('entry-viewer-wrap');
+  // render into whichever screen the entry was opened from
+  const wrap = document.getElementById('page-history').classList.contains('active')
+    ? document.getElementById('history-viewer-wrap')
+    : document.getElementById('entry-viewer-wrap');
   const catsStr = entry.cats ? entry.cats.join(' + ') : 'protection';
   const vibeStr = entry.vibe ? `arrived <strong>${entry.vibe}</strong> \u00b7 ` : '';
 
-  // Build questions reveal
-  const questions = [{ label: 'anchor', text: entry.anchorQ || ANCHOR.question }];
+  // Build questions reveal \u2014 afternoon entries have no anchor
+  const questions = [];
+  if ((entry.mode || 'morning') === 'morning') {
+    questions.push({ label: 'anchor', text: entry.anchorQ || ANCHOR.question });
+  }
   if (entry.secondQ) questions.push({ label: entry.secondQId || 'q', text: entry.secondQ });
+  if (!questions.length) {
+    questions.push({ label: 'pm', text: 'time to wind down. what did today actually bring?' });
+  }
   const questionsHTML = questions.map(item =>
     `<div class="context-q-item"><span class="context-q-label">${item.label}</span>${item.text}</div>`
   ).join('');
@@ -1659,15 +2153,17 @@ function viewEntry(id) {
 
 function closeViewer() {
   document.getElementById('entry-viewer-wrap').style.display = 'none';
+  document.getElementById('history-viewer-wrap').style.display = 'none';
 }
 
 function exportEntries() {
   if (!appData.entries.length) { showToast('no entries to export'); return; }
   const lines = appData.entries.map(e => {
+    const mode = e.mode || 'morning';
     const cats = e.cats ? e.cats.join(' + ') : 'protection';
     const vibe = e.vibe ? `arrived: ${e.vibe} \u00b7 ` : '';
     const title = e.title ? `\n${e.title}` : '';
-    return `${e.dateDisplay || e.date}${title}\n${vibe}wrote through ${cats}\n\n${e.body}\n\n---`;
+    return `${e.dateDisplay || e.date} \u00b7 ${mode}${title}\n${vibe}wrote through ${cats}\n\n${e.body}\n\n---`;
   }).join('\n\n');
   const blob = new Blob([lines], { type: 'text/plain' });
   const url = URL.createObjectURL(blob);
@@ -1706,22 +2202,9 @@ function autosaveTick() {
   if (!quill) return;
   const bodyText = quill.getText().trim();
   if (!bodyText) return;
-  const title = document.getElementById('title-input')?.value.trim() || '';
-  const q = selectedQuestion ? QUESTIONS.find(q => q.id === selectedQuestion) : null;
-  localStorage.setItem('transitions_draft', JSON.stringify({
-    title,
-    body: bodyText,
-    bodyHTML: quill.root.innerHTML,
-    bodyDelta: JSON.stringify(quill.getContents()),
-    vibe: selectedVibe,
-    cats: ['protection', q ? q.category : null].filter(Boolean),
-    selectedQuestion,
-    anchorQ: ANCHOR.question,
-    secondQ: q ? q.text : null,
-    secondQId: q ? q.id : null,
-    savedAt: new Date().toISOString(),
-    autosaved: true,
-  }));
+  const payload = buildDraftPayload();
+  payload.autosaved = true;
+  localStorage.setItem('transitions_draft', JSON.stringify(payload));
   showAutosavedLabel();
 }
 
