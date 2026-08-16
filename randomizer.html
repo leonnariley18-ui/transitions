@@ -307,12 +307,13 @@ function generatePDF() {
   .page { width: 148mm; min-height: 105mm; padding: 10mm 11mm; page-break-after: always; display: flex; flex-direction: column; }
   .page:last-child { page-break-after: auto; }
   .page-label { font-size: 7px; letter-spacing: 0.16em; text-transform: uppercase; color: #9088C0; margin-bottom: 6mm; font-weight: 500; }
-  .anchor-block { border: 0.5px solid #C8C0E8; border-radius: 6px; padding: 5mm 6mm; margin-bottom: 5mm; background: #F8F6FF; }
+  .anchor-block { border: 0.5px solid #C8C0E8; border-radius: 6px; padding: 5mm 6mm; margin-bottom: 4mm; background: #F8F6FF; }
   .anchor-name { font-size: 7px; letter-spacing: 0.14em; text-transform: uppercase; color: #7068A0; margin-bottom: 2mm; font-weight: 500; }
   .anchor-q { font-family: 'Playfair Display', Georgia, serif; font-size: 10px; line-height: 1.55; color: #1A1728; margin-bottom: 2mm; }
-  .harvest-block { border: 0.5px dashed #C8C0E8; border-radius: 6px; padding: 4mm 6mm; margin-bottom: 5mm; }
-  .harvest-q { font-family: 'Playfair Display', Georgia, serif; font-size: 9.5px; line-height: 1.55; color: #4A4270; font-style: italic; }
-  .anchor-sub { font-size: 7px; color: #9088C0; font-style: italic; line-height: 1.6; }
+  .harvest-block { border: 0.5px dashed #C8C0E8; border-radius: 6px; padding: 4mm 6mm; margin-bottom: 4mm; }
+  .harvest-q { font-family: 'Playfair Display', Georgia, serif; font-size: 9.5px; line-height: 1.55; color: #4A4270; }
+  .anchor-sub { font-size: 7px; color: #9088C0; line-height: 1.6; }
+  .anchor-p { font-size: 7.5px; color: #5A5280; line-height: 1.7; margin: 2mm 0; }
   .mood-section { margin-bottom: 4mm; }
   .mood-head { font-size: 7px; letter-spacing: 0.14em; text-transform: uppercase; color: #7068A0; margin-bottom: 2.5mm; font-weight: 500; padding-bottom: 1.5mm; border-bottom: 0.5px solid #E0DCF0; }
   .q-row { display: flex; gap: 3mm; margin-bottom: 2mm; align-items: baseline; }
@@ -335,12 +336,14 @@ function generatePDF() {
   <div class="anchor-block">
     <div class="anchor-name">the root · every night · all moods</div>
     <div class="anchor-q">Is there anything my body is still carrying that I can consciously release?</div>
+    <div class="anchor-p">Unprocessed stress lives in your body as tension, shallow breathing, and looping thoughts. This question signals to your nervous system that the day is complete — it's safe to stand down. You're not suppressing anything. You're teaching your body how to close a chapter.</div>
     <div class="anchor-sub">answer first or last — up to you each night</div>
   </div>
   <div class="harvest-block">
     <div class="anchor-name" style="color:#7068A0;">the harvest · to close</div>
     <div class="harvest-q">What from today is worth keeping?</div>
-    <div class="anchor-sub" style="margin-top:1.5mm;">one or two sentences · always last</div>
+    <div class="anchor-p" style="color:#6A6090;">Your brain's negativity bias holds onto difficulty and lets the good slip through. The root clears what needs to go. The harvest closes the night by naming what the day actually produced that's worth taking with you. One or two sentences, no more.</div>
+    <div class="anchor-sub" style="margin-top:1.5mm;">always last</div>
   </div>
 
   <div class="mood-section">
