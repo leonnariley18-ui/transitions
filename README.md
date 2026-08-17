@@ -10,7 +10,7 @@ No accounts. No subscriptions. No ads. No data sharing. PIN-protected, cloud-syn
 
 ### transitions — `index.html`
 
-A morning commute journal. Built for the ride between your private world and the performance of the day. Vibe check → question selection → writing space. Designed for the G train, works on any train.
+A commute journal for both ends of the day. Morning: vibe check → question selection → writing space, built for the ride between your private world and the performance of the day. Afternoon: no vibe check, straight into a wind-down question picker → writing space, built for the ride home. Designed for the G train, works on any train.
 
 **Live at:** `https://leonnariley18-ui.github.io/transitions/`
 
@@ -24,7 +24,9 @@ A pre-sleep question randomizer for physical journal practice. Mood-filtered, an
 
 ## transitions — what it does
 
-**Home** — anchor question front and center with its full reasoning paragraph, so you remember why you're here before you even begin. Entry count (not a streak — no pressure). Collapsible library of past entries below.
+**Home** — a three-position slider switches between morning, afternoon, and history. A hero photo sits behind the top of the screen (sunrise for morning, dusk for afternoon) and the whole app re-themes to match — light and cool in the morning, warm and dusk-toned in the afternoon. Entry count (not a streak — no pressure).
+
+### morning
 
 **Vibe check** — how are you arriving today? Five options with clarifying descriptions:
 - *scattered* — too much in the present
@@ -37,19 +39,28 @@ Your vibe shapes which questions surface first on the next screen.
 
 **Question selection** — anchor always loads first. One more question from the bank, surfaced by vibe with the most relevant options at the top. Each question has an info button that explains exactly what it's doing for your nervous system. Cap of anchor + one — enough for a commute, never overwhelming. Skip to writing anytime.
 
-**Writing space** — free-form contenteditable field with full formatting:
+### afternoon
+
+The evening counterpart — winding down instead of gearing up. No vibe check; tap the anchor card straight into the question picker. Pick one or more questions (or none) from two pools: two afternoon-only questions, plus reworded evening versions of two morning-bank questions ("did I let good enough be enough *today*" instead of "what would good enough look like"). Marked with a moon and a small "at night" tag next to the app name.
+
+### writing space
+
+Free-form contenteditable field with full formatting, shared by both modes:
 - Text fonts: Playfair Display, Montserrat, DM Sans, Poppins, Raleway, Merriweather, Roboto Slab
 - Display fonts (title): Playfair Display, Oswald, Bebas Neue, Chewy, Bagel Fat One, Dancing Script
 - Bold, italic, bullet list, font size up/down
 - Text color (8 options) and highlight (6 options)
 - Toolbar collapses and pulls out with one tap
 - Selection is preserved when toolbar is open so formatting applies to the right text
+- Title placeholder and save path follow whichever mode you're writing in
 
-**Save draft** — mid-entry save that preserves everything (vibe, question, title, writing, font choices). Lock your phone, switch trains, get interrupted — come back exactly where you left off. Discard button on home screen clears the draft with one confirmation tap.
+**Save draft** — mid-entry save that preserves everything (mode, vibe or selected questions, title, writing, font choices). Lock your phone, switch trains, get interrupted — come back exactly where you left off, in the same mode you left it in. Discard button on home screen clears the draft with one confirmation tap.
 
-**Library** — search by keyword, filter by vibe and category, read past entries in full (read-only). Export to .txt for sharing and pattern analysis.
+### history
 
-**Auto-generated entry context** — every entry logs "arrived heavy · wrote through protection + release" so when you read it back months later the full picture is there without any extra effort.
+A dedicated archive screen, one slider-tap away from home. Search by keyword, filter by mode (☀️ morning / 🌙 afternoon), vibe, and category — vibe filters dim automatically when only afternoon entries are shown, since afternoon entries don't carry a vibe. Read past entries in full (read-only). Export to .txt for sharing and pattern analysis. Kept visually neutral (gray, archival) on purpose — it doesn't shift with time of day the way the rest of the app does.
+
+**Auto-generated entry context** — every entry logs "arrived heavy · wrote through protection + release" so when you read it back months later the full picture is there without any extra effort. Entries saved before afternoon mode existed have no `mode` field and are treated as morning everywhere — no migration needed.
 
 **Sync dot** — top right corner of the writing screen. 🟢 green = synced, 🟡 amber = saving, 🔴 red = sync error.
 
@@ -74,6 +85,15 @@ The anchor question appears every morning automatically before anything else —
 | Q6 | Where am I most likely to lose myself today, and can I stay a little more present there? | awareness | clear |
 | Q7 | What's one thing already in place today that I don't have to figure out? | grounding | scattered · anxious |
 | Q8 | Is there anything I'm carrying from yesterday that isn't mine to carry today? | release | heavy |
+
+**afternoon question bank** — no vibe-based surfacing; all options are shown at once, multi-select:
+
+| # | question | category | source |
+|---|---|---|---|
+| Q9 | Where did today actually take me, versus where I thought it was going? | awareness | afternoon-only |
+| Q10 | What does my body need in the next two hours? My spirit? My mind? | body scan | afternoon-only |
+| Q1 (pm) | Did I let good enough be enough today? | self-compassion | reworded from Q1 |
+| Q8 (pm) | Is there anything I'm carrying from today that isn't mine to bring home? | release | reworded from Q8 |
 
 ---
 
@@ -154,7 +174,9 @@ The night randomizer and question key are browser-only tools — bookmark them r
 
 | file | what it is |
 |---|---|
-| `index.html` | transitions morning journal app |
+| `index.html` | transitions app — morning + afternoon journal, history screen |
+| `bg-morning.jpg` | home screen hero photo, morning mode |
+| `bg-afternoon.jpg` | home screen hero photo, afternoon mode |
 | `manifest.json` | PWA manifest for home screen installation |
 | `icon-192.png` | app icon 192px |
 | `icon-512.png` | app icon 512px |
