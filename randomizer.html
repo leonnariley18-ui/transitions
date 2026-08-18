@@ -10,101 +10,155 @@
 <title>night journal</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { background: #1A1728; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+html, body { background: #1A1728; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; position: relative; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
+/* ── Background photo ──
+   night-windows.jpg / night-moon.jpg are optional — until they exist in the
+   repo, only the gradient shows, so the page still looks intentional. Fixed
+   behind everything, not a banner — content scrolls over it in glass cards. */
+#bg-photo {
+  position: fixed; inset: 0; z-index: 0;
+  background-size: cover; background-position: center; background-repeat: no-repeat;
+  transition: background-image 0.4s ease;
+}
+#bg-photo::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(20,17,31,0.2) 0%, rgba(20,17,31,0.4) 45%, rgba(20,17,31,0.6) 100%);
+}
+#bg-photo.tab-tonight { background-image: url('./night-windows.jpg'); background-position: center; }
+#bg-photo.tab-past { background-image: url('./night-moon.jpg'); background-position: center 40%; }
+
 /* ── Layout ── */
-.wrap { max-width: 400px; margin: 0 auto; background: #1A1728; min-height: 100vh; display: flex; flex-direction: column; }
+.wrap { max-width: 400px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; position: relative; z-index: 1; }
 
 /* ── Header ── */
 .app-header { padding: 1.25rem 1.25rem 0; display: flex; align-items: center; justify-content: space-between; }
-.app-title { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #B8B0D4; font-weight: 600; }
-.btn-print { padding: 7px 14px; background: transparent; border: 0.5px solid #38305A; border-radius: 8px; font-size: 11px; color: #7068A0; cursor: pointer; letter-spacing: 0.04em; font-family: inherit; transition: all 0.15s; }
-.btn-print:hover { background: #2C2848; color: #B8B0D4; border-color: #5A4E90; }
+.app-title-group { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.app-title { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #F0ECF8; font-weight: 600; text-shadow: 0 1px 4px rgba(0,0,0,0.35); }
+.app-sub { font-size: 10px; color: #C8C0E8; font-weight: 400; text-shadow: 0 1px 4px rgba(0,0,0,0.35); }
+.btn-print { padding: 7px 14px; background: rgba(34,30,53,0.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 0.5px solid rgba(90,78,144,0.6); border-radius: 8px; font-size: 11px; color: #D0C8F0; cursor: pointer; letter-spacing: 0.04em; font-family: inherit; transition: all 0.15s; }
+.btn-print:hover { background: rgba(44,40,72,0.7); color: #F0ECF8; border-color: #6058A0; }
 
 /* ── Tabs ── */
 .tab-bar { display: flex; gap: 6px; padding: 1rem 1.25rem 0; }
-.tab { flex: 1; padding: 9px 10px; background: transparent; border: 0.5px solid #38305A; border-radius: 10px; font-size: 11px; letter-spacing: 0.06em; color: #7068A0; cursor: pointer; font-family: inherit; text-align: center; transition: all 0.15s; }
-.tab:hover { background: #2C2848; color: #B8B0D4; }
-.tab.active { background: #221E35; color: #F0ECF8; border-color: #6058A0; }
+.tab { flex: 1; padding: 9px 10px; background: rgba(34,30,53,0.4); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 0.5px solid rgba(90,78,144,0.5); border-radius: 10px; font-size: 11px; letter-spacing: 0.06em; color: #C8C0E8; cursor: pointer; font-family: inherit; text-align: center; transition: all 0.15s; }
+.tab:hover { background: rgba(44,40,72,0.6); color: #F0ECF8; }
+.tab.active { background: rgba(96,88,160,0.55); color: #F0ECF8; border-color: #8A7FC0; }
 
 /* ── Tab panels ── */
 .tab-panel { display: none; padding: 1.25rem 1.25rem 3rem; flex: 1; }
 .tab-panel.active { display: block; }
+
+.tonight-right { min-width: 0; }
 
 /* ── Labels ── */
 .label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #7068A0; margin-bottom: 8px; font-weight: 500; }
 
 /* ── Anchor pair ── */
 .anchor-pair { margin-bottom: 1.75rem; }
-.anchor-card { background: #221E35; border: 0.5px solid #38305A; border-radius: 14px 14px 0 0; padding: 1.1rem 1.25rem; border-bottom: none; }
-.harvest-card { background: #1E1D2E; border: 0.5px solid #38305A; border-top: 0.5px dashed #38305A; border-radius: 0 0 14px 14px; padding: 1.1rem 1.25rem; }
+.anchor-card { background: rgba(34,30,53,0.68); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 0.5px solid rgba(90,78,144,0.45); border-radius: 14px 14px 0 0; padding: 1.1rem 1.25rem; border-bottom: none; }
+.harvest-card { background: rgba(30,29,46,0.68); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 0.5px solid rgba(90,78,144,0.45); border-top: 0.5px dashed rgba(90,78,144,0.45); border-radius: 0 0 14px 14px; padding: 1.1rem 1.25rem; }
 .anchor-q { font-size: 16px; line-height: 1.65; color: #F0ECF8; font-weight: normal; font-family: Georgia, serif; }
 .harvest-q { font-size: 15px; line-height: 1.65; color: #D0C8F0; font-weight: normal; font-family: Georgia, serif; }
-.anchor-divider { height: 0.5px; background: #38305A; margin: 12px 0; }
-.anchor-why { font-size: 12px; line-height: 1.8; color: #7068A0; font-weight: 400; }
-.anchor-note { font-size: 11px; color: #6058A0; margin-top: 10px; font-weight: 500; }
+.anchor-divider { height: 0.5px; background: rgba(90,78,144,0.45); margin: 12px 0; }
+.anchor-why { font-size: 12px; line-height: 1.8; color: #B0A8D8; font-weight: 400; }
+.anchor-note { font-size: 11px; color: #9088C0; margin-top: 10px; font-weight: 500; }
 
 /* ── Mood ── */
-.mood-label { font-size: 13px; color: #B8B0D4; margin-bottom: 10px; font-weight: 500; }
+.mood-label { font-size: 13px; color: #F0ECF8; margin-bottom: 10px; font-weight: 500; text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
 .mood-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 1.5rem; }
-.mood-btn { padding: 10px 6px; border: 0.5px solid #38305A; border-radius: 10px; background: #221E35; cursor: pointer; font-size: 12px; color: #B8B0D4; text-align: center; line-height: 1.4; transition: all 0.15s; font-family: inherit; font-weight: 500; }
-.mood-btn:hover { background: #2C2848; }
-.mood-btn.selected { border: 1.5px solid #E090A8; color: #E090A8; background: #341825; }
+.mood-btn { padding: 10px 6px; border: 0.5px solid rgba(90,78,144,0.45); border-radius: 10px; background: rgba(34,30,53,0.55); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); cursor: pointer; font-size: 12px; color: #D0C8F0; text-align: center; line-height: 1.4; transition: all 0.15s; font-family: inherit; font-weight: 500; }
+.mood-btn:hover { background: rgba(44,40,72,0.7); }
+.mood-btn.selected { border: 1.5px solid #E090A8; color: #E090A8; background: rgba(52,24,37,0.75); }
 
 /* ── Question card ── */
-.question-card { background: #221E35; border: 0.5px solid #38305A; border-radius: 14px; padding: 1.1rem 1.25rem; margin-bottom: 1rem; min-height: 96px; display: flex; flex-direction: column; justify-content: center; }
+.question-card { background: rgba(34,30,53,0.68); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 0.5px solid rgba(90,78,144,0.45); border-radius: 14px; padding: 1.1rem 1.25rem; margin-bottom: 1rem; min-height: 96px; display: flex; flex-direction: column; justify-content: center; }
 .question-text { font-size: 16px; line-height: 1.65; color: #F0ECF8; font-family: Georgia, serif; }
-.question-placeholder { font-size: 14px; color: #7068A0; line-height: 1.6; }
+.question-placeholder { font-size: 14px; color: #B0A8D8; line-height: 1.6; }
 .why-wrap { display: none; }
 .why-wrap.visible { display: block; }
-.why-divider { height: 0.5px; background: #38305A; margin: 14px 0 12px; }
-.why-label { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #7068A0; margin-bottom: 7px; font-weight: 500; }
-.why-text { font-size: 12px; line-height: 1.8; color: #7068A0; font-weight: 400; }
+.why-divider { height: 0.5px; background: rgba(90,78,144,0.45); margin: 14px 0 12px; }
+.why-label { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #9088C0; margin-bottom: 7px; font-weight: 500; }
+.why-text { font-size: 12px; line-height: 1.8; color: #B0A8D8; font-weight: 400; }
 
 /* ── Buttons ── */
 .btn-row { display: flex; gap: 8px; }
 .btn-primary { flex: 1; padding: 11px; background: #E090A8; border: none; border-radius: 10px; font-size: 13px; color: #fff; cursor: pointer; font-family: inherit; transition: opacity 0.15s, transform 0.1s; letter-spacing: 0.02em; font-weight: 600; }
 .btn-primary:hover { opacity: 0.88; }
 .btn-primary:active { transform: scale(0.98); }
-.btn-reroll { padding: 11px 14px; background: transparent; border: 0.5px solid #38305A; border-radius: 10px; font-size: 12px; color: #7068A0; cursor: pointer; transition: all 0.15s; white-space: nowrap; font-family: inherit; font-weight: 500; }
-.btn-reroll:hover:not(:disabled) { background: #2C2848; color: #B8B0D4; }
+.btn-reroll { padding: 11px 14px; background: rgba(34,30,53,0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 0.5px solid rgba(90,78,144,0.45); border-radius: 10px; font-size: 12px; color: #C8C0E8; cursor: pointer; transition: all 0.15s; white-space: nowrap; font-family: inherit; font-weight: 500; }
+.btn-reroll:hover:not(:disabled) { background: rgba(44,40,72,0.7); color: #F0ECF8; }
 .btn-reroll:disabled { opacity: 0.3; cursor: not-allowed; }
-.reroll-note { font-size: 11px; color: #7068A0; text-align: right; margin-top: 6px; min-height: 18px; }
+.reroll-note { font-size: 11px; color: #C8C0E8; text-align: right; margin-top: 6px; min-height: 18px; text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
 
 /* ── Season note ── */
-.season-note { font-size: 11px; color: #4A4270; text-align: center; margin-top: 1.5rem; letter-spacing: 0.04em; font-weight: 500; }
+.season-note { font-size: 11px; color: #C8C0E8; text-align: center; margin-top: 1.5rem; letter-spacing: 0.04em; font-weight: 500; text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
 
 /* ── Soul Therapy (tab 2) ── */
 .st-header { margin-bottom: 1.25rem; }
-.st-phase-note { background: #221E35; border: 0.5px solid #38305A; border-radius: 10px; padding: 14px 16px; margin-bottom: 1.5rem; }
-.st-phase-note-label { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: #6058A0; margin-bottom: 6px; font-weight: 600; }
-.st-phase-note-body { font-size: 12px; color: #B8B0D4; line-height: 1.7; font-weight: 400; }
-.st-reveal-btn { width: 100%; padding: 11px; background: transparent; border: 0.5px solid #3D2535; border-radius: 10px; font-size: 12px; color: #C08090; cursor: pointer; letter-spacing: 0.04em; font-family: inherit; transition: all 0.2s; font-weight: 600; }
-.st-reveal-btn:hover { background: #2A1820; color: #E0A0B0; border-color: #5A3045; }
+.st-phase-note { background: rgba(34,30,53,0.68); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 0.5px solid rgba(90,78,144,0.45); border-radius: 10px; padding: 14px 16px; margin-bottom: 1.5rem; }
+.st-phase-note-label { font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: #9088C0; margin-bottom: 6px; font-weight: 600; }
+.st-phase-note-body { font-size: 12px; color: #E0DCF0; line-height: 1.7; font-weight: 400; }
+.st-reveal-btn { width: 100%; padding: 11px; background: rgba(36,16,24,0.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 0.5px solid rgba(90,48,69,0.6); border-radius: 10px; font-size: 12px; color: #E0A0B0; cursor: pointer; letter-spacing: 0.04em; font-family: inherit; transition: all 0.2s; font-weight: 600; }
+.st-reveal-btn:hover { background: rgba(42,24,32,0.75); color: #F0C0CC; border-color: #7A4058; }
 .st-content { display: none; margin-top: 1rem; }
 .st-content.open { display: block; }
-.st-source-label { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #7A5060; margin-bottom: 12px; font-weight: 500; }
-.st-question-card { background: #241018; border: 0.5px solid #3D2535; border-radius: 14px; padding: 1.25rem; margin-bottom: 0.75rem; }
+.st-source-label { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: #C09AA8; margin-bottom: 12px; font-weight: 500; text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+.st-question-card { background: rgba(36,16,24,0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 0.5px solid rgba(90,48,69,0.5); border-radius: 14px; padding: 1.25rem; margin-bottom: 0.75rem; }
 .st-question-text { font-size: 15px; line-height: 1.7; color: #E8C0CC; font-family: Georgia, serif; font-weight: normal; }
 .st-nav { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
-.st-nav-btn { background: transparent; border: 0.5px solid #3D2535; border-radius: 8px; padding: 7px 14px; font-size: 11px; color: #9A6070; cursor: pointer; font-family: inherit; transition: all 0.15s; letter-spacing: 0.04em; font-weight: 500; }
-.st-nav-btn:hover { background: #2A1820; color: #C08090; border-color: #5A3045; }
-.st-entry-toggle { font-size: 11px; color: #7A5060; cursor: pointer; letter-spacing: 0.04em; margin-top: 12px; display: block; border-bottom: 0.5px solid #3D2535; padding-bottom: 2px; transition: color 0.15s; width: fit-content; -webkit-tap-highlight-color: transparent; font-weight: 500; }
-.st-entry-toggle:hover { color: #C08090; }
-.st-entry-text { display: none; margin-top: 14px; border-left: 1.5px solid #3D2535; padding-left: 14px; }
+.st-nav-btn { background: rgba(36,16,24,0.5); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 0.5px solid rgba(90,48,69,0.55); border-radius: 8px; padding: 7px 14px; font-size: 11px; color: #C090A0; cursor: pointer; font-family: inherit; transition: all 0.15s; letter-spacing: 0.04em; font-weight: 500; }
+.st-nav-btn:hover { background: rgba(42,24,32,0.75); color: #E0A0B0; border-color: #7A4058; }
+.st-entry-toggle { font-size: 11px; color: #D0A8B4; cursor: pointer; letter-spacing: 0.04em; margin-top: 12px; display: block; border-bottom: 0.5px solid rgba(90,48,69,0.6); padding-bottom: 2px; transition: color 0.15s; width: fit-content; -webkit-tap-highlight-color: transparent; font-weight: 500; text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+.st-entry-toggle:hover { color: #F0C0CC; }
+.st-entry-text { display: none; margin-top: 14px; border-left: 1.5px solid rgba(90,48,69,0.6); padding-left: 14px; }
 .st-entry-text.open { display: block; }
-.st-entry-para { font-size: 12px; line-height: 1.9; color: #7A5060; font-family: Georgia, serif; margin-bottom: 14px; }
+.st-entry-para { font-size: 12px; line-height: 1.9; color: #C098A8; font-family: Georgia, serif; margin-bottom: 14px; text-shadow: 0 1px 4px rgba(0,0,0,0.3); }
 .st-entry-para:last-child { margin-bottom: 0; }
-.st-entry-num { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #9A6070; font-weight: 600; margin-bottom: 4px; display: block; }
+.st-entry-num { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #D0A0B0; font-weight: 600; margin-bottom: 4px; display: block; }
+
+/* ── Desktop ──
+   Used mostly on desktop per the person who built this, so past ~860px:
+   wider frame, a taller hero, a two-column "tonight" layout (anchor/harvest
+   read on the left, mood + question stay put on the right), and a capped
+   reading width on "past self" so long paragraphs don't run edge to edge. */
+@media (min-width: 860px) {
+  .wrap { max-width: 840px; }
+  .app-header { padding: 1.75rem 2rem 0; }
+  .app-title-group { flex-direction: row; align-items: baseline; gap: 8px; }
+  .tab-bar { padding: 1.25rem 2rem 0; max-width: 360px; }
+  .tab-panel { padding: 1.75rem 2rem 4rem; }
+
+  #panel-tonight.active {
+    display: grid; grid-template-columns: 1.05fr 0.95fr; column-gap: 2.5rem; row-gap: 0;
+    align-items: start;
+  }
+  #panel-tonight .anchor-pair { margin-bottom: 0; }
+  #panel-tonight .season-note { grid-column: 1 / -1; margin-top: 2rem; text-align: left; }
+
+  #panel-past.active { max-width: 620px; margin: 0 auto; }
+
+  .anchor-q, .harvest-q, .question-text { font-size: 17px; }
+  .anchor-why, .why-text, .st-entry-para { font-size: 13px; }
+  .st-question-text { font-size: 16px; }
+  .question-card { padding: 1.4rem 1.5rem; min-height: 120px; }
+  .anchor-card, .harvest-card { padding: 1.4rem 1.5rem; }
+  .mood-row { gap: 10px; }
+  .mood-btn { padding: 12px 8px; }
+}
 </style>
 </head>
 <body>
+<div class="tab-tonight" id="bg-photo"></div>
 <div class="wrap">
   <h2 class="sr-only">Night journal question randomizer</h2>
 
   <div class="app-header">
-    <span class="app-title">night journal</span>
+    <div class="app-title-group">
+      <span class="app-title">night journal</span>
+      <span class="app-sub" id="app-sub">winding down</span>
+    </div>
     <button class="btn-print" onclick="generatePDF()">print question key</button>
   </div>
 
@@ -132,28 +186,30 @@ html, body { background: #1A1728; min-height: 100vh; font-family: -apple-system,
       </div>
     </div>
 
-    <div class="mood-label">how are you feeling tonight?</div>
-    <div class="mood-row">
-      <button class="mood-btn" onclick="selectMood('good', this)">pretty good</button>
-      <button class="mood-btn" onclick="selectMood('middle', this)">in between</button>
-      <button class="mood-btn" onclick="selectMood('hard', this)">it was hard</button>
-    </div>
-
-    <div class="question-card" id="q-card">
-      <div id="q-num" class="label" style="display:none; margin-bottom:6px;"></div>
-      <div id="q-text" class="question-placeholder">select a mood to get your question</div>
-      <div class="why-wrap" id="why-wrap">
-        <div class="why-divider"></div>
-        <div class="why-label">why this question</div>
-        <div class="why-text" id="why-text"></div>
+    <div class="tonight-right">
+      <div class="mood-label">how are you feeling tonight?</div>
+      <div class="mood-row">
+        <button class="mood-btn" onclick="selectMood('good', this)">pretty good</button>
+        <button class="mood-btn" onclick="selectMood('middle', this)">in between</button>
+        <button class="mood-btn" onclick="selectMood('hard', this)">it was hard</button>
       </div>
-    </div>
 
-    <div class="btn-row" id="btn-row" style="display:none">
-      <button class="btn-primary" id="btn-get" onclick="getQuestion()">give me a question</button>
-      <button class="btn-reroll" id="btn-reroll" onclick="reroll()" disabled>not tonight</button>
+      <div class="question-card" id="q-card">
+        <div id="q-num" class="label" style="display:none; margin-bottom:6px;"></div>
+        <div id="q-text" class="question-placeholder">select a mood to get your question</div>
+        <div class="why-wrap" id="why-wrap">
+          <div class="why-divider"></div>
+          <div class="why-label">why this question</div>
+          <div class="why-text" id="why-text"></div>
+        </div>
+      </div>
+
+      <div class="btn-row" id="btn-row" style="display:none">
+        <button class="btn-primary" id="btn-get" onclick="getQuestion()">give me a question</button>
+        <button class="btn-reroll" id="btn-reroll" onclick="reroll()" disabled>not tonight</button>
+      </div>
+      <div class="reroll-note" id="reroll-note"></div>
     </div>
-    <div class="reroll-note" id="reroll-note"></div>
 
     <div class="season-note">the root and the harvest · next check-in november 2026</div>
   </div>
@@ -219,6 +275,12 @@ function switchTab(tab) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
   document.getElementById('panel-' + tab).classList.add('active');
+
+  const bg = document.getElementById('bg-photo');
+  bg.classList.remove('tab-tonight', 'tab-past');
+  bg.classList.add('tab-' + tab);
+  document.getElementById('app-sub').textContent =
+    tab === 'tonight' ? 'winding down' : 'a message from your past self';
 }
 
 function selectMood(mood, btn) {
@@ -307,13 +369,12 @@ function generatePDF() {
   .page { width: 148mm; min-height: 105mm; padding: 10mm 11mm; page-break-after: always; display: flex; flex-direction: column; }
   .page:last-child { page-break-after: auto; }
   .page-label { font-size: 7px; letter-spacing: 0.16em; text-transform: uppercase; color: #9088C0; margin-bottom: 6mm; font-weight: 500; }
-  .anchor-block { border: 0.5px solid #C8C0E8; border-radius: 6px; padding: 5mm 6mm; margin-bottom: 4mm; background: #F8F6FF; }
+  .anchor-block { border: 0.5px solid #C8C0E8; border-radius: 6px; padding: 5mm 6mm; margin-bottom: 5mm; background: #F8F6FF; }
   .anchor-name { font-size: 7px; letter-spacing: 0.14em; text-transform: uppercase; color: #7068A0; margin-bottom: 2mm; font-weight: 500; }
   .anchor-q { font-family: 'Playfair Display', Georgia, serif; font-size: 10px; line-height: 1.55; color: #1A1728; margin-bottom: 2mm; }
-  .harvest-block { border: 0.5px dashed #C8C0E8; border-radius: 6px; padding: 4mm 6mm; margin-bottom: 4mm; }
-  .harvest-q { font-family: 'Playfair Display', Georgia, serif; font-size: 9.5px; line-height: 1.55; color: #4A4270; }
-  .anchor-sub { font-size: 7px; color: #9088C0; line-height: 1.6; }
-  .anchor-p { font-size: 7.5px; color: #5A5280; line-height: 1.7; margin: 2mm 0; }
+  .harvest-block { border: 0.5px dashed #C8C0E8; border-radius: 6px; padding: 4mm 6mm; margin-bottom: 5mm; }
+  .harvest-q { font-family: 'Playfair Display', Georgia, serif; font-size: 9.5px; line-height: 1.55; color: #4A4270; font-style: italic; }
+  .anchor-sub { font-size: 7px; color: #9088C0; font-style: italic; line-height: 1.6; }
   .mood-section { margin-bottom: 4mm; }
   .mood-head { font-size: 7px; letter-spacing: 0.14em; text-transform: uppercase; color: #7068A0; margin-bottom: 2.5mm; font-weight: 500; padding-bottom: 1.5mm; border-bottom: 0.5px solid #E0DCF0; }
   .q-row { display: flex; gap: 3mm; margin-bottom: 2mm; align-items: baseline; }
@@ -336,14 +397,12 @@ function generatePDF() {
   <div class="anchor-block">
     <div class="anchor-name">the root · every night · all moods</div>
     <div class="anchor-q">Is there anything my body is still carrying that I can consciously release?</div>
-    <div class="anchor-p">Unprocessed stress lives in your body as tension, shallow breathing, and looping thoughts. This question signals to your nervous system that the day is complete — it's safe to stand down. You're not suppressing anything. You're teaching your body how to close a chapter.</div>
     <div class="anchor-sub">answer first or last — up to you each night</div>
   </div>
   <div class="harvest-block">
     <div class="anchor-name" style="color:#7068A0;">the harvest · to close</div>
     <div class="harvest-q">What from today is worth keeping?</div>
-    <div class="anchor-p" style="color:#6A6090;">Your brain's negativity bias holds onto difficulty and lets the good slip through. The root clears what needs to go. The harvest closes the night by naming what the day actually produced that's worth taking with you. One or two sentences, no more.</div>
-    <div class="anchor-sub" style="margin-top:1.5mm;">always last</div>
+    <div class="anchor-sub" style="margin-top:1.5mm;">one or two sentences · always last</div>
   </div>
 
   <div class="mood-section">

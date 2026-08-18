@@ -181,6 +181,8 @@ The night randomizer and question key are browser-only tools — bookmark them r
 | `icon-192.png` | app icon 192px |
 | `icon-512.png` | app icon 512px |
 | `randomizer.html` | night journal question randomizer |
+| `night-windows.jpg` | night journal hero photo, tonight tab |
+| `night-moon.jpg` | night journal hero photo, past self tab |
 
 ---
 
