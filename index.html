@@ -66,6 +66,13 @@ body.mode-afternoon {
   --pm-border: #7A5B3E;
 }
 
+/* History keeps its own neutral gray, but body itself needs to match too —
+   any exposed body area (overscroll bounce, safe-area insets on a phone)
+   otherwise shows the default lavender --bg instead of history's gray. */
+body.mode-history {
+  --bg: #F2F2F0;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; background: var(--bg); transition: background 0.4s ease; }
 body { font-family: var(--font-body); font-weight: 300; color: var(--text); transition: color 0.4s ease; }
