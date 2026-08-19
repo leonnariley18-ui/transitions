@@ -27,7 +27,7 @@ html, body { background: #1A1728; min-height: 100vh; font-family: -apple-system,
   background: linear-gradient(180deg, rgba(20,17,31,0.2) 0%, rgba(20,17,31,0.4) 45%, rgba(20,17,31,0.6) 100%);
 }
 #bg-photo.tab-tonight { background-image: url('./night-windows.jpg'); background-position: center; }
-#bg-photo.tab-past { background-image: url('./night-moon.jpg'); background-position: center 40%; }
+#bg-photo.tab-past { background-image: url('./night-moon.jpg'); background-position: center 18%; background-size: 130%; }
 
 /* ── Layout ── */
 .wrap { max-width: 400px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; position: relative; z-index: 1; }
@@ -39,6 +39,39 @@ html, body { background: #1A1728; min-height: 100vh; font-family: -apple-system,
 .app-sub { font-size: 10px; color: #C8C0E8; font-weight: 400; text-shadow: 0 1px 4px rgba(0,0,0,0.35); }
 .btn-print { padding: 7px 14px; background: rgba(34,30,53,0.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 0.5px solid rgba(90,78,144,0.6); border-radius: 8px; font-size: 11px; color: #D0C8F0; cursor: pointer; letter-spacing: 0.04em; font-family: inherit; transition: all 0.15s; }
 .btn-print:hover { background: rgba(44,40,72,0.7); color: #F0ECF8; border-color: #6058A0; }
+
+/* ── Number draw (1–371) ── */
+.header-actions { display: flex; align-items: center; gap: 8px; }
+.num-roll {
+  display: flex; align-items: center; gap: 5px;
+  padding: 7px 13px; border-radius: 20px;
+  background: rgba(224,144,168,0.16); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 0.5px solid rgba(224,144,168,0.45);
+  color: #F0BFCE; font-size: 11px; font-weight: 500; letter-spacing: 0.02em;
+  cursor: pointer; font-family: inherit; transition: background 0.15s, border-color 0.15s, transform 0.15s;
+}
+.num-roll:hover { background: rgba(224,144,168,0.28); border-color: rgba(224,144,168,0.7); }
+.num-roll:active { transform: scale(0.96); }
+.num-roll-icon {
+  display: inline-block; font-size: 11px; color: #E090A8;
+  animation: sparkle-idle 3.5s ease-in-out infinite;
+}
+.num-roll.rolling .num-roll-icon { animation: sparkle-spin 0.5s linear infinite; }
+.num-roll-value { min-width: 1.6em; text-align: left; font-variant-numeric: tabular-nums; }
+.num-roll.landed .num-roll-value { animation: num-pop 0.45s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes sparkle-idle {
+  0%, 100% { opacity: 0.7; transform: rotate(0deg) scale(1); }
+  50% { opacity: 1; transform: rotate(20deg) scale(1.15); }
+}
+@keyframes sparkle-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes num-pop {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.35); color: #fff; }
+  100% { transform: scale(1); }
+}
 
 /* ── Tabs ── */
 .tab-bar { display: flex; gap: 6px; padding: 1rem 1.25rem 0; }
@@ -159,7 +192,13 @@ html, body { background: #1A1728; min-height: 100vh; font-family: -apple-system,
       <span class="app-title">night journal</span>
       <span class="app-sub" id="app-sub">winding down</span>
     </div>
-    <button class="btn-print" onclick="generatePDF()">print question key</button>
+    <div class="header-actions">
+      <button class="num-roll" id="num-roll" onclick="rollNumber()" title="draw a number, 1–371">
+        <span class="num-roll-icon">✦</span>
+        <span class="num-roll-value" id="num-roll-value">draw</span>
+      </button>
+      <button class="btn-print" onclick="generatePDF()">print question key</button>
+    </div>
   </div>
 
   <div class="tab-bar">
@@ -269,6 +308,32 @@ const questions = {
 let currentMood = null;
 let lastQuestion = null;
 let rerollUsed = false;
+
+// ── Number draw ────────────────────────────────────────────────────────────
+let rollTimer = null;
+
+function rollNumber() {
+  const btn = document.getElementById('num-roll');
+  const el = document.getElementById('num-roll-value');
+  if (rollTimer) clearInterval(rollTimer);
+  btn.classList.remove('landed');
+  btn.classList.add('rolling');
+
+  let ticks = 0;
+  const totalTicks = 9;
+  rollTimer = setInterval(() => {
+    el.textContent = String(1 + Math.floor(Math.random() * 371));
+    ticks++;
+    if (ticks >= totalTicks) {
+      clearInterval(rollTimer);
+      rollTimer = null;
+      el.textContent = String(1 + Math.floor(Math.random() * 371));
+      btn.classList.remove('rolling');
+      btn.classList.add('landed');
+      setTimeout(() => btn.classList.remove('landed'), 500);
+    }
+  }, 55);
+}
 
 function switchTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
