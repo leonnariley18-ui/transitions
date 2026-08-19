@@ -179,6 +179,16 @@ html, body { background: #1A1728; min-height: 100vh; font-family: -apple-system,
   .anchor-card, .harvest-card { padding: 1.4rem 1.5rem; }
   .mood-row { gap: 10px; }
   .mood-btn { padding: 12px 8px; }
+
+  /* The moon photo is portrait (640x960) — great on a phone-shaped viewport,
+     but cover has to scale it ~2x to fill a wide desktop window, which is
+     the "crazy" zoom. Swap to a landscape photo here instead of fighting
+     the aspect ratio. */
+  #bg-photo.tab-past {
+    background-image: url('./night-horizon.jpg');
+    background-position: center 65%;
+    background-size: cover;
+  }
 }
 </style>
 </head>
